@@ -40,20 +40,20 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-  app.UseSwagger();
-  app.UseSwaggerUI();
-}
+// if (app.Environment.IsDevelopment())
+// {
+//   app.UseSwagger();
+//   app.UseSwaggerUI();
+// }
 
 app.MapControllers();
 app.MapHub<TrelloHub>("/r/trelloHub");
 app.MapHub<LikeHub>("/r/LikeHub");
 
-app.MapGet("/", () => "Hey!");
+// app.MapGet("/", () => "Hey!");
 
 app.UseDefaultFiles();
 app.UseStaticFiles();
-// app.MapFallbackToFile("index.html");
+app.MapFallbackToFile("index.html");
 
 app.Run();

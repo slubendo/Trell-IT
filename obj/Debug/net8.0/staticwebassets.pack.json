@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/StephaneLubendo.png",
+      "PackagePath": "staticwebassets/StephaneLubendo.png"
+    },
+    {
+      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/assets/index-CX9_aZsJ.css",
+      "PackagePath": "staticwebassets/assets/index-CX9_aZsJ.css"
+    },
+    {
+      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/assets/index-Ds8SmliR.js",
+      "PackagePath": "staticwebassets/assets/index-Ds8SmliR.js"
+    },
+    {
+      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/index.html",
+      "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.TrelloLike.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.TrelloLike.props",
+      "PackagePath": "build\\TrelloLike.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.TrelloLike.props",
+      "PackagePath": "buildMultiTargeting\\TrelloLike.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.TrelloLike.props",
+      "PackagePath": "buildTransitive\\TrelloLike.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TrelloLike")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5f8e032b40206304c6bee6af9879d6bb39d8a5c8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0e72abf6bed906d6a0bd848498d4304e71fd342b")]
 [assembly: System.Reflection.AssemblyProductAttribute("TrelloLike")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TrelloLike")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

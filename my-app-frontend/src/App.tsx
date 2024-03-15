@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faPenToSquare, faTrashCan} from '@fortawesome/free-regular-svg-icons';
+import { faHeart, faTrashCan} from '@fortawesome/free-regular-svg-icons';
 import './App.css'
 import { createLike, createTrello, deleteTrello, fetchLikes, fetchTrellos, updateLike } from './action';
 import useSignalR from "./useSignalR";
@@ -12,13 +12,6 @@ type Trello = {
   section:string;
   createdAt: string;
 };
-
-type Like = {
-  id: number;
-  TrelloId: number;
-  liked: boolean;
-};
-
 
 
 function App() {
@@ -145,7 +138,6 @@ function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
 
 
   const target = e.target;
-  let body = document.querySelector("body")
 
   if(target instanceof HTMLElement || target instanceof SVGSVGElement) {
   let section = target.closest(".Section")

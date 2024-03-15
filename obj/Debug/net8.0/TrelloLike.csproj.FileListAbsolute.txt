@@ -112,3 +112,4 @@
 /home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/bin/Debug/net8.0/Newtonsoft.Json.dll
 /home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/bin/Debug/net8.0/System.Net.WebSockets.WebSocketProtocol.dll
 /home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/obj/Debug/net8.0/TrelloLike.sourcelink.json
+/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/bin/Debug/net8.0/TrelloLike.staticwebassets.runtime.json
