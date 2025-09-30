@@ -26,7 +26,7 @@ builder.Services.AddDbContext<DatabaseContext>(
     opt => {
       opt
       .UseMySql(connectionString, serverVersion);
-        if (builder.Environment.IsDevelopment())
+      if (builder.Environment.IsDevelopment())
       {
         opt
           .LogTo(Console.WriteLine, LogLevel.Information)
@@ -35,7 +35,23 @@ builder.Services.AddDbContext<DatabaseContext>(
       }
     }
 );
+
 builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+});
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173") // your React dev server
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // needed for SignalR
+        });
+});
 
 builder.Services.AddSignalR();
 
@@ -50,9 +66,12 @@ var app = builder.Build();
 //   app.UseSwaggerUI();
 // }
 
+app.UseRouting();
+app.UseCors("AllowFrontend");
+ 
 app.MapControllers();
 app.MapHub<TrelloHub>("/r/trelloHub");
-app.MapHub<LikeHub>("/r/LikeHub");
+app.MapHub<TrelloLikeHub>("/r/trellolikeHub");
 
 // app.MapGet("/", () => "Hey!");
 

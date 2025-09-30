@@ -10,11 +10,16 @@ public class DatabaseContext : DbContext
 
   public DbSet<Trello> Trellos => Set<Trello>();
   
-  public DbSet<Like> Likes => Set<Like>();
+  public DbSet<TrelloLike> TrelloLikes => Set<TrelloLike>();
+  public DbSet<TrelloPerson> TrelloPersons => Set<TrelloPerson>();
 
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    modelBuilder.Entity<TrelloLike>().ToTable("TrelloLike");
+    modelBuilder.Entity<TrelloPerson>().ToTable("TrelloPerson");
+    modelBuilder.Entity<Trello>().ToTable("Trello");
+    
     modelBuilder.Entity<Trello>()
         .Property(e => e.CreatedAt)
         .HasDefaultValueSql("now()");

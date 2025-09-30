@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHeart, faTrashCan} from '@fortawesome/free-regular-svg-icons';
+import { faCalendarXmark, faHeart} from '@fortawesome/free-regular-svg-icons';
 import './App.css'
 import { createLike, createTrello, deleteTrello, fetchLikes, fetchTrellos, updateLike } from './action';
 import useSignalR from "./useSignalR";
@@ -15,15 +17,16 @@ type Trello = {
 
 
 function App() {
-  const [likes, setLikes] = useState<{ id: number; trelloId: number; liked: boolean; }[]>([]);
+  const [likes, setLikes] = useState<{ id: number; trelloId: number; trelloPersonId:number; liked: boolean; }[]>([]);
   const [trellos, setTrellos] = useState<{ id: number; section: string; content: string; }[]>([]);
   const [close, setClose] = useState(false)  
   const [mount, setMount] = useState(false)
 
 
 
-  const { connection: connectionTrello } = useSignalR("/r/trelloHub");
-  const { connection: connectionLike } = useSignalR("/r/likeHub");
+const { connection: connectionTrello } = useSignalR("https://task-it-list.fly.dev/r/trelloHub");
+const { connection: connectionTrelloLike } = useSignalR("https://task-it-list.fly.dev/r/trellolikeHub");
+
 
 
   useEffect(() => {
@@ -54,19 +57,19 @@ function App() {
   }, [connectionTrello]);
 
   useEffect(() => {
-    if (!connectionLike) {
+    if (!connectionTrelloLike) {
       return;
     }
     // listen for messages from the server
-    connectionLike.on("ReceiveLike", (updatedLikes: { id: number; trelloId: number; liked: boolean; }[]) => {
+    connectionTrelloLike.on("ReceiveLike", (updatedLikes: { id: number; trelloId: number; trelloPersonId:number; liked: boolean; }[]) => {
       // from the server
       setLikes(updatedLikes);
     });
 
     return () => {
-      connectionLike.off("ReceiveLike");
+      connectionTrelloLike.off("ReceiveLike");
     };
-  }, [connectionLike]);
+  }, [connectionTrelloLike]);
 
 
 
@@ -103,19 +106,20 @@ function exampleLiked(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
   }
 }
 
-async function liked(e: React.MouseEvent<SVGSVGElement, MouseEvent>, id: number) {
+async function liked(e: React.MouseEvent<SVGSVGElement, MouseEvent>, id: number, trelloid:number) {
   e.preventDefault();
 
-  const likedTrello = likes.find((like: any) => like.trelloId === id);
+  const likedTrello = likes.find((like: any) => like.trelloId === trelloid);
 
   if (likedTrello) {
-    console.log("hello");
+    console.log(likedTrello);
+    console.log(likedTrello.liked)
     await updateLike(likedTrello.id, likedTrello.trelloId, likedTrello.liked);
   } else {
     console.log("hey");
-    await createLike(id);
+    await createLike(trelloid);
   }
-  connectionTrello?.invoke("UpdateLike", id)
+  connectionTrelloLike?.invoke("UpdateLike", id)
 }
 
 
@@ -128,7 +132,7 @@ async function handleDelete(id:number) {
 function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
   e.preventDefault()
 
-  let open = document.querySelectorAll(".open")
+  const open = document.querySelectorAll(".open")
   if(open) {
     for(const element of open) {
       element.remove()
@@ -140,8 +144,8 @@ function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
   const target = e.target;
 
   if(target instanceof HTMLElement || target instanceof SVGSVGElement) {
-  let section = target.closest(".Section")
-  let column = section?.querySelector(".Column")
+  const section = target.closest(".Section")
+  const column = section?.querySelector(".Column")
   let newSection;
 
   if(column) {
@@ -153,22 +157,50 @@ function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
 
   }
 
-
-  const div = column?.querySelector(".relative")
+  const body = document.querySelector("body")
+  const div = body?.querySelector(".example")
   const newDiv = div?.cloneNode(true) as HTMLElement;
+  const date = newDiv?.querySelector(".date");
+
+  date?.remove();
   newDiv.classList.add("open","New", newSection ?? "undefined")
-  let h4 = newDiv?.querySelector("h4")
+  const h4 = newDiv?.querySelector("h4")
   if(h4 && div) {
-    let input = document.createElement("input") 
+    const input = document.createElement("input") 
     input.className = h4.className
     input.classList.remove("text-center")
-    input.classList.add("mb-1")
+   input.classList.add(
+    "mb-8",            // margin bottom
+    "border",           // border
+    "border-gray-400",  // gray border
+    "rounded",          // rounded corners
+    "px-3",             // horizontal padding (width inside)
+    "py-2",             // vertical padding (height inside)
+    "w-full",           // stretch to full width of parent
+    "focus:outline-none",
+    "focus:ring-1",
+    "focus:ring-indigo-500"
+  );   
     newDiv.insertBefore(input, h4)
 
-    let span = newDiv.querySelector("span")
+    const span = newDiv.querySelector("span")
     span?.remove()
-    let elipse = newDiv.querySelector("button")
+    const elipse = newDiv.querySelector("button")
     elipse?.remove()
+
+      const bottomWrapper = document.createElement("div");
+      bottomWrapper.classList.add(
+        "absolute",
+        "bottom-2",
+        "left-4",   // match input px-3
+        "right-4",             // horizontal padding (width inside) 
+        "flex",
+        "justify-between",
+        "items-center"
+      );
+
+    const buttonWrapper = document.createElement("div");
+    buttonWrapper.classList.add("flex", "gap-2");
 
     const button = document.createElement("button")
     button.className = h4.className
@@ -176,7 +208,34 @@ function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
     button.classList.add("p-1", "text-right", "bg-indigo-500", "rounded", "text-white", "create")
     button.innerHTML = "create"
 
-    h4.insertAdjacentElement("afterend", button); 
+    const cancelButton = document.createElement("button")
+    cancelButton.className = h4.className
+    cancelButton.classList.remove("text-center", "mt-3")
+    cancelButton.classList.add("p-1", "text-right", "bg-gray-200", "rounded", "cancel")
+    cancelButton.innerHTML = "cancel"
+
+    cancelButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const openTrello = (event.target as HTMLElement).closest(".open");
+      if (openTrello) openTrello.remove();
+      setClose(true);
+    });
+
+    // append in correct order: create → cancel
+    buttonWrapper.appendChild(button);
+    buttonWrapper.appendChild(cancelButton);
+
+
+      const avatar = newDiv?.querySelector("img");
+        if (avatar) {
+        avatar.classList.add("w-6", "h-6", "rounded-full");
+        avatar.classList.remove("ml-auto");
+     }
+      
+    bottomWrapper.appendChild(buttonWrapper);
+    if (avatar) bottomWrapper.appendChild(avatar);
+
+  newDiv.appendChild(bottomWrapper);
     h4.remove()
   }
 
@@ -188,18 +247,18 @@ function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
 async function handleCreate(id:number, content:string, section:string) {
   setMount(!mount)
   await createTrello(id, content, section)
-  let createdTrello = {
+  const createdTrello = {
     id: id,
     content: content,
     section: section,
-    createdAt: "2024-02-25T21:11:20.532Z",
+    createdAt: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
   }
 
   connectionTrello?.invoke("SendTrello", createdTrello)
 }
 
 useEffect(() => {
-let body = document.querySelector("body")
+const body = document.querySelector("body")
 
 if (body) {
   body.addEventListener('click', (event) => {
@@ -210,14 +269,14 @@ if (body) {
     if(target instanceof HTMLElement || target instanceof SVGSVGElement) {
 
       if (target.classList.contains("create")) {
-        let newTrello = body?.querySelector(".New")
-        let input = newTrello?.querySelector("input")
+        const newTrello = body?.querySelector(".New")
+        const input = newTrello?.querySelector("input")
         let section;
 
         if(newTrello) {
-          for(const classSections of newTrello?.classList) {
+          for(const classSections of newTrello?.classList ?? []) {
               if(classSections.includes("this")) {
-                let splitSection = classSections.split("-")
+                const splitSection = classSections.split("-")
                 section = splitSection[1]
               }
           }
@@ -225,11 +284,11 @@ if (body) {
         }
         
         let id;
-        let content = input?.value
+        const content = input?.value
         console.log(id, content, section)
         handleCreate(id ?? 0, content ?? "", section ?? "")
         
-        let open = document.querySelectorAll(".open")
+        const open = document.querySelectorAll(".open")
         if(open) {
           for(const element of open) {
             element.remove()
@@ -237,6 +296,7 @@ if (body) {
           setClose(false)
         }
       }
+
     }
   })
 }
@@ -244,7 +304,7 @@ if (body) {
 }, []);
 
 useEffect(() => {
-    let open = document.querySelectorAll(".open")
+    const open = document.querySelectorAll(".open")
     if(open) {
       for(const element of open) {
         element.remove()
@@ -255,53 +315,26 @@ useEffect(() => {
 }, [close]);
 
 
+
 function renderLike(trello: any) {
   if (likes.length > 0) {
     // Find the first like object that matches the trelloId
     const likedTrello = likes.find((like: any) => like.trelloId === trello.id);
 
-    if (likedTrello) {
-      console.log("3");
-      console.log(likedTrello)
+
       return (
         <FontAwesomeIcon
-          key={likedTrello.id}
+          key={likedTrello?.id}
           icon={faHeart}
           className="overflow-hidden"
-          style={{ color: likedTrello.liked ? "red" : "gray" }}
+          style={{ color: likedTrello?.liked ? "red" : "gray" }}
           onClick={(e) => {
-            liked(e, trello.id);
+
+            liked(e, likedTrello?.id ?? 0, trello.id);
             exampleLiked(e);
             }}
           />
       );
-    } else {
-      console.log("2");
-      return (
-        <FontAwesomeIcon
-        icon={faHeart}
-        className="overflow-hidden"
-        style={{ color: "gray" }}
-        onClick={(e) => {
-        liked(e, trello.id);
-        exampleLiked(e);
-        }}
-      />
-      );
-    }
-  } else {
-    console.log("1");
-    return (
-      <FontAwesomeIcon
-        icon={faHeart}
-        className="overflow-hidden"
-        style={{ color: "gray" }}
-        onClick={(e) => {
-          liked(e, trello.id);
-          exampleLiked(e);
-        }}
-      />
-    );
   }
 }
 
@@ -323,7 +356,7 @@ return (
     </div>
 
     <div className="flex items-center justify-center w-8 h-8 ml-auto overflow-hidden rounded-full ">
-      <img src="/StephaneLubendo.png" alt="" />
+      <img src="https://randomuser.me/api/portraits/women/26.jpg" alt="" />
     </div>
   </div>
 
@@ -345,21 +378,52 @@ return (
 
       {/* Backlog Column */}
       <div className="Column this-BackLog flex flex-col pb-2 overflow-auto">
-        <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
+        <div className="example relative flex flex-col items-start py-4 px-3 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
           {/*  delete */}
-          <button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-            <svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-            </svg>
-          </button>
+          <div className="absolute top-1 right-1 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
+              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-red-700' style={{ color: 'indigo' }} onClick={() => handleDelete(trello.id)}/>
+            </div>
           <span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
           <h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-          <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-            <button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-            </button>
-            <img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg'/>
-          </div>
+          
+          {/* Bottom row: left like button, right date + avatar */}
+              <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
+                {/* Left side: like button */}
+                <div className="flex items-center">
+                  <button className="flex items-center ml-1 mr-2">
+                      <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
+                  </button>
+                  <img
+                    className="w-5 h-5 rounded-full mr-1"
+                    src="https://randomuser.me/api/portraits/women/26.jpg"
+                  />                
+                  <img
+                    className="w-5 h-5 rounded-full mr-1"
+                    src="https://randomuser.me/api/portraits/women/26.jpg"
+                  />                
+                  <img
+                    className="w-5 h-5 rounded-full mr-1"
+                    src="https://randomuser.me/api/portraits/women/26.jpg"
+                  />                
+                   <span className='mt-1'>...others</span>
+            
+                </div>
+
+                {/* Spacer */}
+                <div className="flex-1"></div>
+
+                {/* Right side: date + avatar */}
+                <div className="flex items-center gap-2">
+                  <div className="text-gray-500 date">
+                    Jan 1
+                  </div>
+                  <img
+                    className="w-9 h-9 rounded-full"
+                    src="https://randomuser.me/api/portraits/women/26.jpg"
+                  />
+                </div>
+              </div>
+
         </div>
         
         {
@@ -370,7 +434,7 @@ return (
           <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
             {/* delete */}
             <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faTrashCan} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
+              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
             </div>
             <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
             <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
@@ -407,54 +471,45 @@ return (
 
       {/* Ready Column */}
 			<div className="Column this-Ready flex flex-col pb-2 overflow-auto">
-				<div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-					<button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-						<svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-						</svg>
-					</button>
-					<span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-					<h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-					<div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-        		<button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-						</button>
-						<img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg'/>
-					</div>
-				</div>
-				<div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg  bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-					<button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-						<svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-						</svg>
-					</button>
-					<span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-					<h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-					<div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-      		  <button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-						</button>
-						<img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/men/64.jpg'/>
-					</div>
-				</div>
+
+
         {
   trellos.map((trello: any) => {
     if (trello.section === 'Ready') {
       return (
         <div key={trello.id} className={`Ready-${trello.id}`}>
-          <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
+          <div className="relative flex flex-col items-start p-4   mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
             {/* delete */}
-            <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faTrashCan} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
+            <div className="absolute top-0 right-4  items-center justify-center hidden w-5 h-5 mt-3  text-gray-500 rounded group-hover:flex">
+              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
             </div>
             <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
-            <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
-            <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-              <button className="flex items-center">
-              {renderLike(trello)}
-              </button>
-              <img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg' />
-            </div>
+            <h4 className="mt-3 ml-1 text-sm font-medium text-center">{trello.content}</h4>
+
+              {/* Bottom row: left like button, right date + avatar */}
+              <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
+                {/* Left side: like button */}
+                <div className="flex items-center">
+                  <button className="flex items-center">
+                    {renderLike(trello)}
+                  </button>
+                </div>
+
+                {/* Spacer */}
+                <div className="flex-1"></div>
+
+                {/* Right side: date + avatar */}
+                <div className="flex items-center gap-2">
+                  <div className="text-gray-500 date">
+                    {new Date(trello.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  </div>
+                  <img
+                    className="w-6 h-6 rounded-full"
+                    src="https://randomuser.me/api/portraits/women/26.jpg"
+                  />
+                </div>
+              </div>
+
           </div>
         </div>
       );
@@ -480,21 +535,6 @@ return (
 
       {/* Doing Column */}
 			<div className="Column this-Doing flex flex-col pb-2 overflow-auto">
-				<div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg  bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-					<button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-						<svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-						</svg>
-					</button>
-					<span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-					<h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-					<div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-      		  <button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-						</button>
-						<img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg'/>
-					</div>
-				</div>
         {
   trellos.map((trello: any) => {
     if (trello.section === 'Doing') {
@@ -503,7 +543,7 @@ return (
           <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
             {/* delete */}
             <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faTrashCan} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
+              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
             </div>
             <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
             <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
@@ -539,36 +579,7 @@ return (
 
       {/* Review Column */}
 			<div className="Column this-Review flex flex-col pb-2 overflow-auto">
-				<div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg  bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-					<button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-						<svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-						</svg>
-					</button>
-					<span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-					<h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-					<div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-            <button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-						</button>
-						<img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/men/64.jpg'/>
-					</div>
-				</div>
-				<div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg  bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-					<button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-						<svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-						</svg>
-					</button>
-					<span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-					<h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-					<div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-            <button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-						</button>
-						<img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/44.jpg'/>
-					</div>
-				</div>
+				
         {
   trellos.map((trello: any) => {
     if (trello.section === 'Review') {
@@ -577,7 +588,7 @@ return (
           <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
             {/* delete */}
             <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faTrashCan} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
+              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
             </div>
             <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
             <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
@@ -612,21 +623,7 @@ return (
 
       {/* Blocked Column */}
 			<div className="Column this-Blocked flex flex-col pb-2 overflow-auto">
-				<div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg  bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-					<button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-						<svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-						</svg>
-					</button>
-					<span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-					<h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-					<div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-            <button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-						</button>
-						<img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg'/>
-					</div>
-				</div>
+				
         {
   trellos.map((trello: any) => {
     if (trello.section === 'Blocked') {
@@ -635,7 +632,7 @@ return (
           <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
             {/* delete */}
             <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faTrashCan} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
+              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
             </div>
             <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
             <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
@@ -670,21 +667,7 @@ return (
  
 {/* Done Column */}
 			<div className="Column this-Done flex flex-col pb-2 overflow-auto">
-				<div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg  bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-					<button className="absolute top-0 right-0 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded hover:bg-gray-200 hover:text-gray-700 group-hover:flex">
-						<svg className="w-4 h-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-							<path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-						</svg>
-					</button>
-					<span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-					<h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-					<div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-              <button className="flex items-center">
-              <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-						</button>
-						<img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg'/>
-					</div>
-				</div>
+		
         {
   trellos.map((trello: any) => {
     if (trello.section === 'Done') {
@@ -693,7 +676,7 @@ return (
           <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
             {/* delete */}
             <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faTrashCan} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
+              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
             </div>
             <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
             <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>

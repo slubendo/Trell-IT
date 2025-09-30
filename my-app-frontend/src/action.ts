@@ -1,5 +1,5 @@
 export async function fetchLikes(){
-    const dataBody = await fetch("/api/Likes", {
+    const dataBody = await fetch("/api/TrelloLikes", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -12,7 +12,7 @@ export async function fetchLikes(){
   }
 
   export async function fetchLikeId(id:number){
-    const dataBody = await fetch(`/api/Likes/${id}`, {
+    const dataBody = await fetch(`/api/TrelloLikes/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -25,15 +25,16 @@ export async function fetchLikes(){
   }
 
   export async function createLike(id:number) {
-    let createLike = {
-      id: 0,
-      trelloId:id,
-      liked: true
+
+    const createLike = {
+      TrelloId: id,
+      TrelloPersonId: 1,
+      Liked: true
     }
 
     console.log(createLike)
 
-    const dataBody = await fetch(`/api/Likes/`, {
+    const dataBody = await fetch(`/api/TrelloLikes/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,15 +49,17 @@ export async function fetchLikes(){
   }
 
   export async function updateLike(id:number, trelloId:number, liked:boolean){
-    let updateLike = {
-      id: id,
-      trelloId:trelloId,
-      liked: !liked
-    }
+const updateLike = {
+  Id: id,
+  TrelloId: trelloId,
+  TrelloPersonId: 1,
+  Liked: !liked
+}
+
 
     console.log(updateLike)
 
-    const dataBody = await fetch(`/api/Likes/${id}`, {
+    const dataBody = await fetch(`/api/TrelloLikes/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +67,7 @@ export async function fetchLikes(){
       body: JSON.stringify(updateLike),
 
     });
-    const data = await dataBody.json();
+    const data = await dataBody;
     console.log(data)
   
     return data
@@ -86,11 +89,12 @@ export async function fetchLikes(){
 
 
   export async function createTrello(id:number, content:string, section:string){
-    let createTrello = {
+    const createTrello = {
       id: id,
       content: content,
+      trellopersonid:1,
       section: section,
-      createdAt: "2024-02-25T21:11:20.532Z",
+      createdAt:  new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
     }
 
     console.log(createTrello)
@@ -111,11 +115,11 @@ export async function fetchLikes(){
 
 
   export async function updateTrello(id:number, content:string, section:string){
-    let updateTrello = {
+    const updateTrello = {
       id: id,
       content: content,
       section: section,
-      createdAt: "2024-02-25T21:11:20.532Z",
+      createdAt:  new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })
     }
 
     console.log(updateTrello)

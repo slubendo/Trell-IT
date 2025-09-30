@@ -17,8 +17,23 @@ public class TrelloHub : Hub
 
   public async Task SendTrello(string trello)
   {
-      Console.WriteLine($"Received trello: {trello}");
-      await Clients.All.SendAsync("ReceiveTrello", trello);
+    Console.WriteLine($"Received trello: {trello}");
+    await Clients.All.SendAsync("ReceiveTrello", trello);
+  }
+  public async Task UpdateTrello(string trello)
+  {
+
+    Console.WriteLine($"Received updated trello:");
+    await Clients.All.SendAsync("UpdateTrello", trello);
+
+  }
+  
+    public async Task DeleteTrello(string trello)
+  {
+  
+      Console.WriteLine($"Deleted trello:");
+      await Clients.All.SendAsync("DeletedTrello", trello);
+
   }
 
 }

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace TrelloLike.Hubs;
 
-public class LikeHub : Hub
+public class TrelloLikeHub : Hub
 {
 
   public override Task OnConnectedAsync()
