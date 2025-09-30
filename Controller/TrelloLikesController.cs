@@ -41,13 +41,13 @@ public class TrelloLikesController : ControllerBase
     }
 
    [HttpPost]
-    public async Task<ActionResult<TrelloLike.Models.TrelloLike>> PostTrelloLikeItem(TrelloLike.Models.TrelloLike TrelloLike)
+    public async Task<ActionResult<TrelloLike.Models.TrelloLike>> PostTrelloLikeItem([FromBody] TrelloLike.Models.TrelloLike trelloLike)
     {
-        _context.TrelloLikes.Add(TrelloLike);
+        _context.TrelloLikes.Add(trelloLike);
         await _context.SaveChangesAsync();
 
 
-        return CreatedAtAction(nameof(GetTrelloLikeItem), new { id = TrelloLike.Id }, TrelloLike);
+        return CreatedAtAction(nameof(GetTrelloLikeItem), new { id = trelloLike.Id }, trelloLike);
     }
 
 
@@ -66,14 +66,13 @@ public class TrelloLikesController : ControllerBase
         }
 
         // Update only the fields that should change
-        existing.Liked = trelloLike.Liked;
-        existing.TrelloPersonId = trelloLike.TrelloPersonId;
-        existing.TrelloId = trelloLike.TrelloId;
+        existing.Liked = TrelloLike.Liked;
+ 
 
         await _context.SaveChangesAsync();
 
 
-            return Ok(TrelloLike);
+    return Ok(new { done = "done" });
     }
 
     [HttpDelete("{id}")]
@@ -88,6 +87,6 @@ public class TrelloLikesController : ControllerBase
         _context.TrelloLikes.Remove(TrelloLikeItem);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+    return Ok(new { done = "done" });
     }
 }

@@ -16,6 +16,8 @@ type Trello = {
 };
 
 
+
+
 function App() {
   const [likes, setLikes] = useState<{ id: number; trelloId: number; trelloPersonId:number; liked: boolean; }[]>([]);
   const [trellos, setTrellos] = useState<{ id: number; section: string; content: string; }[]>([]);
@@ -24,8 +26,8 @@ function App() {
 
 
 
-const { connection: connectionTrello } = useSignalR("https://task-it-list.fly.dev/r/trelloHub");
-const { connection: connectionTrelloLike } = useSignalR("https://task-it-list.fly.dev/r/trellolikeHub");
+const { connection: connectionTrello } = useSignalR("https://trell-it.fly.dev/r/trelloHub");
+const { connection: connectionTrelloLike } = useSignalR("https://trell-it.fly.dev/r/trellolikeHub");
 
 
 
@@ -44,15 +46,27 @@ const { connection: connectionTrelloLike } = useSignalR("https://task-it-list.fl
       setTrellos((trellos) => [...(trellos || []), newTrello]);
     });
 
-    connectionTrello.on("UpdatedTrello", (trellos: Trello[]) => {
+    connectionTrello.on("UpdatedTrello", (trello: Trello) => {
       // from the server
-      const UpdatedTrellos = trellos.sort((a: { id: number }, b: { id: number }) => a.id - b.id);
-      setTrellos(UpdatedTrellos as { id: number; section: string; content: string; }[]);
+        setTrellos(prevTrellos =>
+          prevTrellos.map(trellos =>
+            trellos.id === trello.id
+              ? { ...trellos, section: trello.section } // toggle liked
+              : trellos // leave others unchanged
+          )
+      );
+    });
+
+    connectionTrello.on("DeleteTrello", (deletedTrelloId:number) => {
+      setTrellos(prevTrellos => 
+        prevTrellos.filter(t => t.id !== deletedTrelloId)
+      );
     });
 
     return () => {
       connectionTrello.off("ReceiveTrello");
       connectionTrello.off("UpdatedTrello");
+      connectionTrello.off("DeleteTrello");
     };
   }, [connectionTrello]);
 
@@ -61,13 +75,38 @@ const { connection: connectionTrelloLike } = useSignalR("https://task-it-list.fl
       return;
     }
     // listen for messages from the server
-    connectionTrelloLike.on("ReceiveLike", (updatedLikes: { id: number; trelloId: number; trelloPersonId:number; liked: boolean; }[]) => {
+     connectionTrelloLike.on("ReceiveLike", (like: {
+          id: number;
+          trelloId: number;
+          trelloPersonId: number;
+          liked: boolean;
+        }) => {
+          console.log('Received like:', like);
+
+          // Map to your internal state shape if needed
+          setLikes(prevLikes => [...prevLikes, {
+            id: like.id,
+            trelloId: like.trelloId,
+            trelloPersonId: like.trelloPersonId,
+            liked: like.liked
+          }]);
+        });
+
+      connectionTrelloLike.on("UpdateLike", (id:number) => {
       // from the server
-      setLikes(updatedLikes);
+        setLikes(prevLikes =>
+          prevLikes.map(like =>
+            like.id === id
+              ? { ...like, liked: !like.liked } // toggle liked
+              : like // leave others unchanged
+          )
+      );
     });
+
 
     return () => {
       connectionTrelloLike.off("ReceiveLike");
+      connectionTrelloLike.off("UpdateLike");
     };
   }, [connectionTrelloLike]);
 
@@ -109,23 +148,33 @@ function exampleLiked(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
 async function liked(e: React.MouseEvent<SVGSVGElement, MouseEvent>, id: number, trelloid:number) {
   e.preventDefault();
 
-  const likedTrello = likes.find((like: any) => like.trelloId === trelloid);
+  const likedTrello = likes.find((like: any) => like.id === id);
 
   if (likedTrello) {
     console.log(likedTrello);
     console.log(likedTrello.liked)
     await updateLike(likedTrello.id, likedTrello.trelloId, likedTrello.liked);
+    connectionTrelloLike?.invoke("UpdateLike", id)
   } else {
     console.log("hey");
-    await createLike(trelloid);
+    const data = await createLike(trelloid);
+
+    const newLike = {
+      Id: data.id,
+      TrelloId: data.trelloId,
+      TrelloPersonId: data.trelloPersonId,
+      Liked: data.liked
+    };
+    connectionTrelloLike?.invoke("CreateLike", newLike)
   }
-  connectionTrelloLike?.invoke("UpdateLike", id)
 }
 
 
 async function handleDelete(id:number) {
   setMount(!mount)
   await deleteTrello(id)
+  connectionTrello?.invoke("DeleteTrello", id)
+
 }
 
 
@@ -317,14 +366,16 @@ useEffect(() => {
 
 
 function renderLike(trello: any) {
+
+  let likedTrello:any;
   if (likes.length > 0) {
     // Find the first like object that matches the trelloId
-    const likedTrello = likes.find((like: any) => like.trelloId === trello.id);
+     likedTrello = likes.find((like: any) => like.trelloId === trello.id);
 
 
       return (
         <FontAwesomeIcon
-          key={likedTrello?.id}
+          key={likedTrello?.id ? 0 :likedTrello?.id}
           icon={faHeart}
           className="overflow-hidden"
           style={{ color: likedTrello?.liked ? "red" : "gray" }}
@@ -380,9 +431,7 @@ return (
       <div className="Column this-BackLog flex flex-col pb-2 overflow-auto">
         <div className="example relative flex flex-col items-start py-4 px-3 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
           {/*  delete */}
-          <div className="absolute top-1 right-1 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-red-700' style={{ color: 'indigo' }} onClick={() => handleDelete(trello.id)}/>
-            </div>
+        
           <span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
           <h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
           

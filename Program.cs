@@ -3,6 +3,8 @@ using TrelloLike.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OpenApi;
 using TrelloLike.Controllers;
+using System.Text.Json;
+
 
 DotNetEnv.Env.Load();
 
@@ -46,12 +48,16 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // your React dev server
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials(); // needed for SignalR
+            policy.WithOrigins(
+                "http://localhost:5173",       // dev
+                "https://trell-it.fly.dev"        // production frontend
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials(); // required for SignalR
         });
 });
+
 
 builder.Services.AddSignalR();
 
@@ -68,7 +74,7 @@ var app = builder.Build();
 
 app.UseRouting();
 app.UseCors("AllowFrontend");
- 
+
 app.MapControllers();
 app.MapHub<TrelloHub>("/r/trelloHub");
 app.MapHub<TrelloLikeHub>("/r/trellolikeHub");

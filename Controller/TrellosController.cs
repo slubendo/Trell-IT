@@ -63,7 +63,7 @@ public class TrellosController : ControllerBase
         await _context.SaveChangesAsync();
 
 
-        return NoContent();
+    return Ok(new { done = "done" });
     }
 
     [HttpDelete("{id}")]
@@ -78,6 +78,6 @@ public class TrellosController : ControllerBase
         _context.Trellos.Remove(TrelloItem);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+    return Ok(new { deleted = id });
     }
 }

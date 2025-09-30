@@ -23,16 +23,16 @@ public class TrelloHub : Hub
   public async Task UpdateTrello(string trello)
   {
 
-    Console.WriteLine($"Received updated trello:");
+    Console.WriteLine($"Received updated trello: {trello}");
     await Clients.All.SendAsync("UpdateTrello", trello);
 
   }
   
-    public async Task DeleteTrello(string trello)
+    public async Task DeleteTrello(int id)
   {
   
-      Console.WriteLine($"Deleted trello:");
-      await Clients.All.SendAsync("DeletedTrello", trello);
+      Console.WriteLine($"Deleted trello with id:{id}");
+      await Clients.All.SendAsync("DeleteTrello", id);
 
   }
 

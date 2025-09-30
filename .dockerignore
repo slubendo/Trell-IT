@@ -1,9 +1,27 @@
-# directories
+# Build output
 **/bin/
 **/obj/
 **/out/
 
-# files
+# Node / Python / temp files (if any)
+node_modules/
+*.pyc
+*.pyo
+*.log
+*.env
+
+# Git and metadata
+.git/
+.gitignore
+
+# Fly & Docker files (optional, if you don't need them in image)
 fly.toml
 Dockerfile*
+
+# Docs and miscellaneous
 **/*.md
+*.sln
+*.user
+*.vs/
+
+my-app-frontend

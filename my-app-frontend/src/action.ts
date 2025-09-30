@@ -26,20 +26,18 @@ export async function fetchLikes(){
 
   export async function createLike(id:number) {
 
-    const createLike = {
+    const TrelloLike = {
       TrelloId: id,
       TrelloPersonId: 1,
       Liked: true
     }
 
-    console.log(createLike)
-
-    const dataBody = await fetch(`/api/TrelloLikes/`, {
+    const dataBody = await fetch(`/api/TrelloLikes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(createLike),
+      body: JSON.stringify(TrelloLike),
 
     });
     const data = await dataBody.json();
