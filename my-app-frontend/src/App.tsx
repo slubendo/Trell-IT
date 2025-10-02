@@ -6,14 +6,22 @@ import { faCalendarXmark, faHeart} from '@fortawesome/free-regular-svg-icons';
 import './App.css'
 import { createLike, createTrello, deleteTrello, fetchLikes, fetchTrellos, updateLike } from './action';
 import useSignalR from "./useSignalR";
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
+
+
+type Section = "BackLog" | "Ready" | "Doing" | "Review" | "Blocked" | "Done";
 
 
 type Trello = {
   id: number;
   content: string;
   section:string;
-  createdAt: string;
+  createdAt: Section;
 };
+
+type Columns = Record<Section, Trello[]>;
+
 
 
 
@@ -21,9 +29,43 @@ type Trello = {
 function App() {
   const [likes, setLikes] = useState<{ id: number; trelloId: number; trelloPersonId:number; liked: boolean; }[]>([]);
   const [trellos, setTrellos] = useState<{ id: number; section: string; content: string; }[]>([]);
+  const [columns, setColumns] = useState<Columns>({
+    BackLog: [],
+    Ready: [],
+    Doing: [],
+    Review: [],
+    Blocked: [],
+    Done: [],
+  });
+console.log(trellos)
   const [close, setClose] = useState(false)  
   const [mount, setMount] = useState(false)
 
+
+useEffect(() => {
+  async function loadTrellos() {
+    const trellos = await fetchTrellos();
+
+    const grouped: Columns = {
+      BackLog: [],
+      Ready: [],
+      Doing: [],
+      Review: [],
+      Blocked: [],
+      Done: []
+    };
+
+    trellos.forEach((t: any) => {
+      if (grouped[t.section as keyof Columns]) {
+        grouped[t.section as keyof Columns].push(t);
+      }
+    });
+
+    setColumns(grouped);
+  }
+
+  loadTrellos();
+}, []);
 
 
 const { connection: connectionTrello } = useSignalR("http://localhost:5193/r/trelloHub");
@@ -392,6 +434,40 @@ function renderLike(trello: any) {
 
 
 
+function handleDragEnd(result: any) {
+  const { source, destination } = result;
+  if (!destination) return;
+
+  if (
+    source.droppableId === destination.droppableId &&
+    source.index === destination.index
+  ) {
+    return;
+  }
+
+  const sourceId = source.droppableId as Section;
+  const destId = destination.droppableId as Section;
+
+  const sourceCol = [...columns[sourceId]];
+  const destCol = [...columns[destId]];
+  const [moved] = sourceCol.splice(source.index, 1);
+
+  moved.section = destId;
+
+  destCol.splice(destination.index, 0, moved);
+
+  setColumns({
+    ...columns,
+    [sourceId]: sourceCol,
+    [destId]: destCol,
+  });
+
+  // sync backend
+  updateTrello(moved.id, moved.content, moved.section);
+  connectionTrello?.invoke("SendTrello", moved);
+}
+
+
 return (
   
 <div className=''>
@@ -415,344 +491,129 @@ return (
   <div className="px-10 mt-6">
     <h1 className="text-2xl font-bold">Team Project Board</h1>
   </div>
-{/* Backlog */}
-  <div className="flex flex-grow px-10 mt-4 space-x-6 overflow-auto">
-    <div className="Section this-BackLog flex flex-col flex-shrink-0 w-72">
-      <div className="flex items-center flex-shrink-0 h-10 px-2">
-        <span className="block text-sm font-semibold">Backlog</span>
-        <button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={handleNew}>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-        </button>
-      </div>
 
-      {/* Backlog Column */}
-      <div className="Column this-BackLog flex flex-col pb-2 overflow-auto">
-        <div className="example relative flex flex-col items-start py-4 px-3 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-          {/*  delete */}
+
+{/* Columns Headers */}
+<DragDropContext onDragEnd={handleDragEnd}>
+
+    
+    <div className="flex flex-grow px-10 mt-4 space-x-6 overflow-auto">
+  {Object.entries(columns).map(([section, cards]) => (
+      <div className="Section this-BackLog flex flex-col flex-shrink-0 w-72">
+        <div className="flex items-center flex-shrink-0 h-10 px-2">
+          <span className="block text-sm font-semibold">{section}</span>
+          <button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={handleNew}>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+            </svg>
+          </button>
+        </div>
+
         
-          <span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
-          <h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>
-          
-          {/* Bottom row: left like button, right date + avatar */}
-              <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-                {/* Left side: like button */}
-                <div className="flex items-center">
-                  <button className="flex items-center ml-1 mr-2">
-                      <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-                  </button>
-                  <img
-                    className="w-5 h-5 rounded-full mr-1"
-                    src="https://randomuser.me/api/portraits/women/26.jpg"
-                  />                
-                  <img
-                    className="w-5 h-5 rounded-full mr-1"
-                    src="https://randomuser.me/api/portraits/women/26.jpg"
-                  />                
-                  <img
-                    className="w-5 h-5 rounded-full mr-1"
-                    src="https://randomuser.me/api/portraits/women/26.jpg"
-                  />                
-                   <span className='mt-1'>...others</span>
-            
-                </div>
-
-                {/* Spacer */}
-                <div className="flex-1"></div>
-
-                {/* Right side: date + avatar */}
-                <div className="flex items-center gap-2">
-                  <div className="text-gray-500 date">
-                    Jan 1
-                  </div>
-                  <img
-                    className="w-9 h-9 rounded-full"
-                    src="https://randomuser.me/api/portraits/women/26.jpg"
-                  />
-                </div>
+  
+              {/*Column */}
+          {section === "BackLog" && (
+            <div className="example relative flex flex-col items-start py-4 px-3 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100">
+                {/*  delete */}        
+                <span className="flex items-center h-6 px-3 text-xs font-semibold text-gray-500 bg-gray-100 rounded-full">.Example</span>
+                <h4 className="mt-3 text-sm font-medium">This is the title of the card for the thing that needs to be done.</h4>     
+                {/* Bottom row: left like button, right date + avatar */}
+                    <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
+                      {/* Left side: like button */}
+                      <div className="flex items-center">
+                        <button className="flex items-center ml-1 mr-2">
+                            <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
+                        </button>
+                        <img
+                          className="w-5 h-5 rounded-full mr-1"
+                          src="https://randomuser.me/api/portraits/women/26.jpg"
+                        />                
+                        <img
+                          className="w-5 h-5 rounded-full mr-1"
+                          src="https://randomuser.me/api/portraits/women/26.jpg"
+                        />                
+                        <img
+                          className="w-5 h-5 rounded-full mr-1"
+                          src="https://randomuser.me/api/portraits/women/26.jpg"
+                        />                
+                        <span className='mt-1'>...others</span>
+                  
+                      </div>
+      
+                      {/* Spacer */}
+                      <div className="flex-1"></div>
+      
+                      {/* Right side: date + avatar */}
+                      <div className="flex items-center gap-2">
+                        <div className="text-gray-500 date">
+                          Jan 1
+                        </div>
+                        <img
+                          className="w-9 h-9 rounded-full"
+                          src="https://randomuser.me/api/portraits/women/26.jpg"
+                        />
+                      </div>
+                    </div>
               </div>
+      )}
 
-        </div>
-        
-        {
-  trellos.map((trello: any) => {
-    if (trello.section === 'BackLog') {
-      return (
-        <div key={trello.id} className={`BackLog-${trello.id}`}>
-          <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-            {/* delete */}
-            <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
-            </div>
-            <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
-            <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
-            <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-              <button className="flex items-center">
-              {renderLike(trello)}
-              </button>
-              <img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg' />
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      return null;
-    }
-  })
-}
-
-
-			</div>
-		</div>
-{/* End of Backlog */}
-
-{/* Ready */}
-		<div className="Section this-Ready flex flex-col flex-shrink-0 w-72">
-			<div className="flex items-center flex-shrink-0 h-10 px-2">
-				<span className="block text-sm font-semibold">Ready</span>
-				<button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
-					<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={handleNew}>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-					</svg>
-				</button>
-			</div>
-
-      {/* Ready Column */}
-			<div className="Column this-Ready flex flex-col pb-2 overflow-auto">
-
-
-        {
-  trellos.map((trello: any) => {
-    if (trello.section === 'Ready') {
-      return (
-        <div key={trello.id} className={`Ready-${trello.id}`}>
-          <div className="relative flex flex-col items-start p-4   mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-            {/* delete */}
-            <div className="absolute top-0 right-4  items-center justify-center hidden w-5 h-5 mt-3  text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
-            </div>
-            <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
-            <h4 className="mt-3 ml-1 text-sm font-medium text-center">{trello.content}</h4>
-
-              {/* Bottom row: left like button, right date + avatar */}
-              <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-                {/* Left side: like button */}
-                <div className="flex items-center">
-                  <button className="flex items-center">
-                    {renderLike(trello)}
-                  </button>
-                </div>
-
-                {/* Spacer */}
-                <div className="flex-1"></div>
-
-                {/* Right side: date + avatar */}
-                <div className="flex items-center gap-2">
-                  <div className="text-gray-500 date">
-                    {new Date(trello.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+      <Droppable droppableId={section} >
+        {(provided) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className="Column this-BackLog flex flex-col pb-2 overflow-auto"
+          >
+            {cards.map((card, index) => (
+              <Draggable key={card.id} draggableId={String(card.id)} index={index}>
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    {...provided.dragHandleProps}
+                    className={`BackLog-${card.id}`}
+                  >
+                    <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100">
+                      {/* delete */}
+                      <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
+                        <FontAwesomeIcon
+                          icon={faCalendarXmark}
+                          className="mx-1 hover:bg-gray-200 hover:text-gray-700"
+                          style={{ color: "gray" }}
+                          onClick={() => handleDelete(card.id)}
+                        />
+                      </div>
+                      <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">
+                        Dev
+                      </span>
+                      <h4 className="mt-3 text-sm font-medium text-center">{card.content}</h4>
+                      <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
+                        <button className="flex items-center">{renderLike(card)}</button>
+                        <img
+                          className="w-6 h-6 ml-auto rounded-full"
+                          src="https://randomuser.me/api/portraits/women/26.jpg"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <img
-                    className="w-6 h-6 rounded-full"
-                    src="https://randomuser.me/api/portraits/women/26.jpg"
-                  />
-                </div>
-              </div>
-
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
           </div>
-        </div>
-      );
-    } else {
-      return null;
-    }
-  })
-}
-			</div>
-		</div>
-{/* End of Ready Column */}
+        )}
+      </Droppable>
 
-{/* Doing*/}
-		<div className="Section this-Doing flex flex-col flex-shrink-0 w-72">
-			<div className="flex items-center flex-shrink-0 h-10 px-2">
-				<span className="block text-sm font-semibold">Doing</span>
-				<button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
-					<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={handleNew}>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-					</svg>
-				</button>
-			</div>
 
-      {/* Doing Column */}
-			<div className="Column this-Doing flex flex-col pb-2 overflow-auto">
-        {
-  trellos.map((trello: any) => {
-    if (trello.section === 'Doing') {
-      return (
-        <div key={trello.id} className={`Doing-${trello.id}`}>
-          <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-            {/* delete */}
-            <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
             </div>
-            <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
-            <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
-            <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-              <button className="flex items-center">
-              {renderLike(trello)}
-              </button>
-              <img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg' />
-            </div>
+            ))}
           </div>
-        </div>
-      );
-    } else {
-      return null;
-    }
-  })
-}
-			</div>
-		</div>
-{/* End of Doing */}
+      </DragDropContext>
 
 
-{/* Review */}
-		<div className="Section this-Review flex flex-col flex-shrink-0 w-72">
-			<div className="flex items-center flex-shrink-0 h-10 px-2">
-				<span className="block text-sm font-semibold">Review</span>
-				<button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
-					<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={handleNew}>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-					</svg>
-				</button>
-			</div>
 
-      {/* Review Column */}
-			<div className="Column this-Review flex flex-col pb-2 overflow-auto">
-				
-        {
-  trellos.map((trello: any) => {
-    if (trello.section === 'Review') {
-      return (
-        <div key={trello.id} className={`Review-${trello.id}`}>
-          <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-            {/* delete */}
-            <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
-            </div>
-            <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
-            <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
-            <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-              <button className="flex items-center">
-              {renderLike(trello)}
-              </button>
-              <img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg' />
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      return null;
-    }
-  })
-}
-			</div>
-		</div>
-{/* End of Review */}
 
-{/* Blocked */}
-		<div className="Section this-Blocked flex flex-col flex-shrink-0 w-72">
-			<div className="flex items-center flex-shrink-0 h-10 px-2">
-				<span className="block text-sm font-semibold">Blocked</span>
-				<button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
-					<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={handleNew}>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-					</svg>
-				</button>
-			</div>
-
-      {/* Blocked Column */}
-			<div className="Column this-Blocked flex flex-col pb-2 overflow-auto">
-				
-        {
-  trellos.map((trello: any) => {
-    if (trello.section === 'Blocked') {
-      return (
-        <div key={trello.id} className={`Blocked-${trello.id}`}>
-          <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-            {/* delete */}
-            <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
-            </div>
-            <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
-            <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
-            <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-              <button className="flex items-center">
-              {renderLike(trello)}
-              </button>
-              <img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg' />
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      return null;
-    }
-  })
-}
-			</div>
-		</div>
-{/* End of blocked Column */}
-
-{/* Done */}
-		<div className="Section this-Done flex flex-col flex-shrink-0 w-72">
-			<div className="flex items-center flex-shrink-0 h-10 px-2">
-				<span className="block text-sm font-semibold">Done</span>
-				<button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
-					<svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" onClick={handleNew}>
-						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-					</svg>
-				</button>
-			</div>
- 
-{/* Done Column */}
-			<div className="Column this-Done flex flex-col pb-2 overflow-auto">
-		
-        {
-  trellos.map((trello: any) => {
-    if (trello.section === 'Done') {
-      return (
-        <div key={trello.id} className={`BackLog-${trello.id}`}>
-          <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100" draggable="true">
-            {/* delete */}
-            <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
-              <FontAwesomeIcon icon={faCalendarXmark} className='mx-1 hover:bg-gray-200 hover:text-gray-700' style={{ color: 'gray' }} onClick={() => handleDelete(trello.id)}/>
-            </div>
-            <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">Dev</span>
-            <h4 className="mt-3 text-sm font-medium text-center">{trello.content}</h4>
-            <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-              <button className="flex items-center">
-              {renderLike(trello)}
-              </button>
-              <img className="w-6 h-6 ml-auto rounded-full" src='https://randomuser.me/api/portraits/women/26.jpg' />
-            </div>
-          </div>
-        </div>
-      );
-    } else {
-      return null;
-    }
-  })
-}
-
-			</div>
-		</div>
-{/* End of Done Column */}
-
-		<div className="flex-shrink-0 w-6"></div>
-    </div>
   </div>
-
-
 </div>
   )
 }
