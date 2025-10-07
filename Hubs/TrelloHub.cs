@@ -1,5 +1,6 @@
 namespace TrelloLike.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using TrelloLike.Models;
 
 public class TrelloHub : Hub
 {
@@ -20,11 +21,11 @@ public class TrelloHub : Hub
     Console.WriteLine($"Received trello: {trello}");
     await Clients.All.SendAsync("ReceiveTrello", trello);
   }
-  public async Task UpdateTrello(string trello)
+  public async Task UpdateTrello(Trello trello)
   {
 
     Console.WriteLine($"Received updated trello: {trello}");
-    await Clients.All.SendAsync("UpdateTrello", trello);
+    await Clients.All.SendAsync("UpdatedTrello", trello);
 
   }
   

@@ -57,13 +57,15 @@ public class TrellosController : ControllerBase
 
         var existingTrello = await _context.Trellos.FindAsync(id);
 
-        existingTrello.Content = Trello.Content;
+        if (existingTrello == null) return NotFound();
+
+        existingTrello.Section = Trello.Section;
 
         _context.Entry(existingTrello).State = EntityState.Modified;
         await _context.SaveChangesAsync();
 
 
-    return Ok(new { done = "done" });
+    return Ok(Trello);
     }
 
     [HttpDelete("{id}")]

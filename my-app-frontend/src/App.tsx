@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarXmark, faHeart} from '@fortawesome/free-regular-svg-icons';
 import './App.css'
-import { createLike, createTrello, deleteTrello, fetchLikes, fetchTrellos, updateLike } from './action';
+import { createLike, createTrello, deleteTrello, fetchLikes, fetchPerson, fetchTrellos, updateLike, updateTrello } from './action';
 import useSignalR from "./useSignalR";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+
 
 
 
@@ -15,6 +16,7 @@ type Section = "BackLog" | "Ready" | "Doing" | "Review" | "Blocked" | "Done";
 
 type Trello = {
   id: number;
+  trelloPersonId:number;
   content: string;
   section:string;
   createdAt: Section;
@@ -28,7 +30,7 @@ type Columns = Record<Section, Trello[]>;
 
 function App() {
   const [likes, setLikes] = useState<{ id: number; trelloId: number; trelloPersonId:number; liked: boolean; }[]>([]);
-  const [trellos, setTrellos] = useState<{ id: number; section: string; content: string; }[]>([]);
+  const [persons, setPersons] = useState<{ id: number; title: string; color:string; imageID: number; }[]>([]);
   const [columns, setColumns] = useState<Columns>({
     BackLog: [],
     Ready: [],
@@ -37,35 +39,58 @@ function App() {
     Blocked: [],
     Done: [],
   });
-console.log(trellos)
-  const [close, setClose] = useState(false)  
-  const [mount, setMount] = useState(false)
+  const [, setClose] = useState<boolean>(true);
+  
+
 
 
 useEffect(() => {
   async function loadTrellos() {
-    const trellos = await fetchTrellos();
+    try {
+      const trellosData = await fetchTrellos();
 
-    const grouped: Columns = {
-      BackLog: [],
-      Ready: [],
-      Doing: [],
-      Review: [],
-      Blocked: [],
-      Done: []
-    };
+      const grouped: Columns = {
+        BackLog: [],
+        Ready: [],
+        Doing: [],
+        Review: [],
+        Blocked: [],
+        Done: []
+      };
 
-    trellos.forEach((t: any) => {
-      if (grouped[t.section as keyof Columns]) {
-        grouped[t.section as keyof Columns].push(t);
-      }
-    });
+      trellosData.forEach((t: any) => {
+        if (grouped[t.section as keyof Columns]) {
+          grouped[t.section as keyof Columns].push(t);
+        }
+      });
 
-    setColumns(grouped);
+      setColumns(grouped);  // only update columns once
+    } catch (error) {
+      console.error("Error fetching trellos:", error);
+    }
   }
 
+  async function loadLikesAndPersons() {
+    try {
+      const [likeData, personData] = await Promise.all([fetchLikes(), fetchPerson()]);
+
+      setLikes(likeData);
+
+      const sortedPersons = personData.sort((a: { id: number }, b: { id: number }) => a.id - b.id);
+      setPersons(sortedPersons);
+      console.log(persons)
+    } catch (error) {
+      console.error("Error fetching likes/persons:", error);
+    }
+  }
+
+  
+
   loadTrellos();
+  loadLikesAndPersons();
 }, []);
+
+
 
 
 const { connection: connectionTrello } = useSignalR("http://localhost:5193/r/trelloHub");
@@ -73,103 +98,117 @@ const { connection: connectionTrelloLike } = useSignalR("http://localhost:5193/r
 
 
 
-  useEffect(() => {
-    if (!connectionTrello) {
-      return;
+useEffect(() => {
+  if (!connectionTrello) {
+    return;
+  }
+  if (!connectionTrelloLike) {
+    return;
+  }
+  // listen for messages from the server
+  connectionTrello.on("ReceiveTrello", (trello: Trello) => {
+  console.log("Received new Trello:", trello);
+
+  setColumns(prevColumns => {
+    const updated: Columns = { ...prevColumns };
+
+    if (updated[trello.section as keyof Columns]) {
+      updated[trello.section as keyof Columns] = [
+        ...updated[trello.section as keyof Columns],
+        trello
+      ];
     }
-    // listen for messages from the server
-    connectionTrello.on("ReceiveTrello", (trello: Trello) => {
-      // from the server
-      const newTrello: { id: number; section: string; content: string; } = {
-        id: trello.id,
-        section: trello.section,
-        content: trello.content
-      };
-      setTrellos((trellos) => [...(trellos || []), newTrello]);
-    });
+
+    return updated;
+  });
+});
+
+
 
     connectionTrello.on("UpdatedTrello", (trello: Trello) => {
-      // from the server
-        setTrellos(prevTrellos =>
-          prevTrellos.map(trellos =>
-            trellos.id === trello.id
-              ? { ...trellos, section: trello.section } // toggle liked
-              : trellos // leave others unchanged
-          )
+      console.log("Received Updated Trello: ", trello);
+
+      setColumns(prevColumns => {
+        const updated: Columns = { ...prevColumns };
+
+        // Remove from all sections (in case section changed)
+        for (const section in updated) {
+          updated[section as keyof Columns] = updated[section as keyof Columns].filter(
+            t => t.id !== trello.id
+          );
+        }
+
+        // Add to the new section
+        if (updated[trello.section as keyof Columns]) {
+          updated[trello.section as keyof Columns] = [
+            ...updated[trello.section as keyof Columns],
+            trello
+          ];
+        }
+
+        return updated;
+      });
+    });
+
+ connectionTrello.on("DeleteTrello", (deletedTrelloId: number) => {
+  console.log("Received delete Trello:", deletedTrelloId);
+
+  setColumns(prevColumns => {
+    const updated: Columns = {} as Columns;
+
+    // loop each section and filter out the deleted card
+    (Object.keys(prevColumns) as (keyof Columns)[]).forEach(section => {
+      updated[section] = prevColumns[section].filter(
+        card => card.id !== deletedTrelloId
       );
     });
 
-    connectionTrello.on("DeleteTrello", (deletedTrelloId:number) => {
-      setTrellos(prevTrellos => 
-        prevTrellos.filter(t => t.id !== deletedTrelloId)
-      );
-    });
+  return updated;
+});
 
-    return () => {
-      connectionTrello.off("ReceiveTrello");
-      connectionTrello.off("UpdatedTrello");
-      connectionTrello.off("DeleteTrello");
-    };
-  }, [connectionTrello]);
+  connectionTrelloLike.on("ReceiveLike", (like: {
+        id: number;
+        trelloId: number;
+        trelloPersonId: number;
+        liked: boolean;
+      }) => {
+        console.log('Received like:', like);
 
-  useEffect(() => {
-    if (!connectionTrelloLike) {
-      return;
-    }
-    // listen for messages from the server
-     connectionTrelloLike.on("ReceiveLike", (like: {
-          id: number;
-          trelloId: number;
-          trelloPersonId: number;
-          liked: boolean;
-        }) => {
-          console.log('Received like:', like);
+        // Map to your internal state shape if needed
+        setLikes(prevLikes => [...prevLikes, {
+          id: like.id,
+          trelloId: like.trelloId,
+          trelloPersonId: like.trelloPersonId,
+          liked: like.liked
+        }]);
+      });
 
-          // Map to your internal state shape if needed
-          setLikes(prevLikes => [...prevLikes, {
-            id: like.id,
-            trelloId: like.trelloId,
-            trelloPersonId: like.trelloPersonId,
-            liked: like.liked
-          }]);
-        });
+    connectionTrelloLike.on("UpdateLike", (id:number) => {
+    // from the server
+      setLikes(prevLikes =>
+        prevLikes.map(like =>
+          like.id === id
+            ? { ...like, liked: !like.liked } // toggle liked
+            : like // leave others unchanged
+        )
+    );
+  });
 
-      connectionTrelloLike.on("UpdateLike", (id:number) => {
-      // from the server
-        setLikes(prevLikes =>
-          prevLikes.map(like =>
-            like.id === id
-              ? { ...like, liked: !like.liked } // toggle liked
-              : like // leave others unchanged
-          )
-      );
-    });
+});
 
 
-    return () => {
-      connectionTrelloLike.off("ReceiveLike");
-      connectionTrelloLike.off("UpdateLike");
-    };
-  }, [connectionTrelloLike]);
+  return () => {
+    console.log("off")
+    connectionTrello.off("ReceiveTrello");
+    connectionTrello.off("UpdatedTrello");
+    connectionTrello.off("DeleteTrello");
+    connectionTrelloLike.off("ReceiveLike");
+    connectionTrelloLike.off("UpdateLike");
+  };
+}, [connectionTrello, connectionTrelloLike]);
 
 
 
-useEffect(() => {
-  async function fetchDataAsync() {
-    try {
-      const likeData = await fetchLikes();
-      const trelloData = await fetchTrellos();
-
-      setLikes(likeData);
-      const sortedTrellos = trelloData.sort((a: { id: number }, b: { id: number }) => a.id - b.id);
-      setTrellos(sortedTrellos);
-      } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  }
-  setMount(false)
-  fetchDataAsync();
-}, [mount]);
 
 
 
@@ -213,7 +252,6 @@ async function liked(e: React.MouseEvent<SVGSVGElement, MouseEvent>, id: number,
 
 
 async function handleDelete(id:number) {
-  setMount(!mount)
   await deleteTrello(id)
   connectionTrello?.invoke("DeleteTrello", id)
 
@@ -252,8 +290,17 @@ function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
   const div = body?.querySelector(".example")
   const newDiv = div?.cloneNode(true) as HTMLElement;
   const date = newDiv?.querySelector(".date");
+  const likeDiv = newDiv?.querySelector(".likeDiv");
+  const imgDiv = newDiv?.querySelector(".profile-pic");
+  const img = imgDiv?.querySelector("img");
 
   date?.remove();
+  likeDiv?.remove();
+  if (img) {
+    img.src = "/2.png";
+    img.className = "w-11 h-11 rounded-full border-blue-300 border-2" 
+  }
+
   newDiv.classList.add("open","New", newSection ?? "undefined")
   const h4 = newDiv?.querySelector("h4")
   if(h4 && div) {
@@ -335,9 +382,8 @@ function handleNew(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
   }
 }
 
-async function handleCreate(id:number, content:string, section:string) {
-  setMount(!mount)
-  await createTrello(id, content, section)
+async function handleCreate(id:number, content:string, personId:number, section:string) {
+  await createTrello(id, content, personId, section)
   const createdTrello = {
     id: id,
     content: content,
@@ -377,7 +423,7 @@ if (body) {
         let id;
         const content = input?.value
         console.log(id, content, section)
-        handleCreate(id ?? 0, content ?? "", section ?? "")
+        handleCreate(id ?? 0, content ?? "", 2, section ?? "")
         
         const open = document.querySelectorAll(".open")
         if(open) {
@@ -394,16 +440,7 @@ if (body) {
 
 }, []);
 
-useEffect(() => {
-    const open = document.querySelectorAll(".open")
-    if(open) {
-      for(const element of open) {
-        element.remove()
-      }
-      setClose(false)
-    }
 
-}, [close]);
 
 
 
@@ -434,7 +471,7 @@ function renderLike(trello: any) {
 
 
 
-function handleDragEnd(result: any) {
+async function handleDragEnd(result: any) {
   const { source, destination } = result;
   if (!destination) return;
 
@@ -463,8 +500,9 @@ function handleDragEnd(result: any) {
   });
 
   // sync backend
-  updateTrello(moved.id, moved.content, moved.section);
-  connectionTrello?.invoke("SendTrello", moved);
+  const data = await updateTrello(moved.id, moved.content, moved.section);
+  console.log(data)
+  connectionTrello?.invoke("UpdateTrello", moved)
 }
 
 
@@ -482,8 +520,11 @@ return (
       <span className="m-1 text-lg font-semibold text-indigo-700">Trell-IT</span>
     </div>
 
-    <div className="flex items-center justify-center w-8 h-8 ml-auto overflow-hidden rounded-full ">
-      <img src="https://randomuser.me/api/portraits/women/26.jpg" alt="" />
+    <div className='flex flex-row align-middle justify-center' >
+      <span className="flex items-center h-6 px-3 my-3 text-md font-semibold text-indigo-700 rounded-full">
+        Developer
+      </span>
+        <img src={`/2.png`} alt=""  className="w-12 h-12 border-blue-300 border-2 rounded-full mr-1"/>
     </div>
   </div>
 
@@ -499,7 +540,8 @@ return (
     
     <div className="flex flex-grow px-10 mt-4 space-x-6 overflow-auto">
   {Object.entries(columns).map(([section, cards]) => (
-      <div className="Section this-BackLog flex flex-col flex-shrink-0 w-72">
+    
+      <div key={section} className={`Section this-${section} flex flex-col flex-shrink-0 w-72`}>
         <div className="flex items-center flex-shrink-0 h-10 px-2">
           <span className="block text-sm font-semibold">{section}</span>
           <button className="flex items-center justify-center w-6 h-6 ml-auto text-indigo-500 rounded hover:bg-indigo-500 hover:text-indigo-100">
@@ -512,6 +554,7 @@ return (
         
   
               {/*Column */}
+          
           {section === "BackLog" && (
             <div className="example relative flex flex-col items-start py-4 px-3 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100">
                 {/*  delete */}        
@@ -520,38 +563,29 @@ return (
                 {/* Bottom row: left like button, right date + avatar */}
                     <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
                       {/* Left side: like button */}
-                      <div className="flex items-center">
+                      <div className="flex likeDiv items-center">
                         <button className="flex items-center ml-1 mr-2">
                             <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
                         </button>
                         <img
-                          className="w-5 h-5 rounded-full mr-1"
-                          src="https://randomuser.me/api/portraits/women/26.jpg"
+                          className="w-9 h-9 border-green-300 border-2 rounded-full mr-1"
+                          src="/1.png"
                         />                
                         <img
-                          className="w-5 h-5 rounded-full mr-1"
-                          src="https://randomuser.me/api/portraits/women/26.jpg"
+                          className="w-9 h-9 border-purple-300 border-2 rounded-full mr-1"
+                          src="/3.png"
                         />                
-                        <img
-                          className="w-5 h-5 rounded-full mr-1"
-                          src="https://randomuser.me/api/portraits/women/26.jpg"
-                        />                
-                        <span className='mt-1'>...others</span>
-                  
                       </div>
       
                       {/* Spacer */}
                       <div className="flex-1"></div>
       
                       {/* Right side: date + avatar */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex profile-pic items-center gap-2">
                         <div className="text-gray-500 date">
                           Jan 1
                         </div>
-                        <img
-                          className="w-9 h-9 rounded-full"
-                          src="https://randomuser.me/api/portraits/women/26.jpg"
-                        />
+                          <img src={`/2.png`} alt=""  className="w-12 h-12 border-blue-300 border-2 rounded-full mr-1"/>                     
                       </div>
                     </div>
               </div>
@@ -560,19 +594,21 @@ return (
       <Droppable droppableId={section} >
         {(provided) => (
           <div
+            key={section}
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="Column this-BackLog flex flex-col pb-2 overflow-auto"
+            className={`Column this-${section} flex flex-col pb-2 overflow-auto`}
           >
             {cards.map((card, index) => (
               <Draggable key={card.id} draggableId={String(card.id)} index={index}>
                 {(provided) => (
-                  <div
+              <div
+                    key={card.id} 
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`BackLog-${card.id}`}
-                  >
+                    className={`${section}-${card.id}`}>
+                      
                     <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100">
                       {/* delete */}
                       <div className="absolute top-0 right-5 flex items-center justify-center hidden w-5 h-5 mt-3 mr-2 text-gray-500 rounded group-hover:flex">
@@ -583,17 +619,63 @@ return (
                           onClick={() => handleDelete(card.id)}
                         />
                       </div>
-                      <span className="flex items-center h-6 px-3 text-xs font-semibold text-blue-500 bg-blue-100 rounded-full">
-                        Dev
+                      <span className={`flex items-center h-6 px-3 text-xs font-semibold text-${persons[card.trelloPersonId].color}-500 bg-${persons[card.trelloPersonId].color}-100 rounded-full`}>
+                        {persons[card.trelloPersonId].title}
                       </span>
                       <h4 className="mt-3 text-sm font-medium text-center">{card.content}</h4>
-                      <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
-                        <button className="flex items-center">{renderLike(card)}</button>
-                        <img
-                          className="w-6 h-6 ml-auto rounded-full"
-                          src="https://randomuser.me/api/portraits/women/26.jpg"
-                        />
+
+                     <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
+                      {/* Left side: like button */}
+                      <div className="flex likeDiv items-center">
+                        <button className="flex items-center ml-1 mr-2">
+                            <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}}  onClick={() => renderLike(card)}/>
+                        </button>
+                          {likes
+                          .filter((like) => like.trelloId === card.id)  
+                          .slice(0, 3)                                 
+                          .map((like) => {
+                            const person = persons.find(p => p.id === like.trelloPersonId); // get correct person
+                            if (!person) return null;
+
+                            return (
+                              <img className={`w-9 h-9 border-${person.color}-300 border-2 rounded-full mr-1`}
+                                key={like.id}
+                             // @ts-expect-error variable camelCase
+                                src={`/${person.imageId.toString()}.png`}
+                                alt="user"
+                              />
+                            );
+                          })
+                        }
+
+                        {likes.filter((like) => like.trelloId === card.id).length > 3 && (
+                          <span className="mt-1">...others</span>
+                      )}
+                  
                       </div>
+      
+                      {/* Spacer */}
+                      <div className="flex-1"></div>
+      
+                      {/* Right side: date + avatar */}
+                      <div className="flex profile-pic items-center gap-2">
+                        <div className="text-gray-500 date">
+                          {card.createdAt}
+                        </div>
+                        {(() => {
+                            const person = persons.find(p => p.id == card.trelloPersonId);
+                            if (!person) return null;
+                            return (
+                              <img
+                                className={`w-12 h-12 border-${person.color}-300 rounded-full border-2`}
+                                // @ts-expect-error variable camelCase
+                                src={`/${person.imageId.toString()}.png`}
+                                alt="user"
+                              />
+                            );
+                          })()}
+                      </div>
+                    </div>
                     </div>
                   </div>
                 )}
