@@ -6,60 +6,43 @@ import {
 } from "@microsoft/signalr";
 
 export default function useSignalR(url: string) {
-  const [connection, setConnection] = useState<HubConnection | undefined>(
-    undefined
-  );
+  const [connection, setConnection] = useState<HubConnection | null>(null);
+
+
 
   useEffect(() => {
-    let canceled = false;
-    const connection = new HubConnectionBuilder()
+    let active = true;
+
+    const conn = new HubConnectionBuilder()
       .withUrl(url)
       .withAutomaticReconnect()
       .configureLogging(LogLevel.Information)
       .build();
 
-    connection
-      .start()
-      .then(() => {
-        if (!canceled) {
-          setConnection(connection);
+    const startConnection = async () => {
+      try {
+        await conn.start();
+        if (active) {
+          console.log("✅ SignalR connected");
+          setConnection(conn);
         }
-      })
-      .catch((error) => {
-        console.log("signal error", error);
-      });
-
-    // @ts-ignore
-    connection.onclose((error) => {
-      if (canceled) {
-        return;
+      } catch (err) {
+        console.error("❌ SignalR start error:", err);
+        setTimeout(startConnection, 1000); // retry
       }
-      console.log("signal closed");
-      setConnection(undefined);
-    });
+    };
 
-    // @ts-ignore
-    connection.onreconnecting((error) => {
-      if (canceled) {
-        return;
-      }
-      console.log("signal reconnecting");
-      setConnection(undefined);
-    });
+    conn.onreconnecting(error => console.log("🔄 Reconnecting...", error));
+    conn.onreconnected(connectionId => console.log("✅ Reconnected:", connectionId));
+    conn.onclose(error => console.warn("⚠️ Connection closed", error));
 
-    // @ts-ignore
-    connection.onreconnected((error) => {
-      if (canceled) {
-        return;
-      }
-      console.log("signal reconnected");
-      setConnection(connection);
-    });
+    startConnection();
 
-    // Clean up the connection when the component unmounts
     return () => {
-      canceled = true;
-      connection.stop();
+      active = false;
+      conn.stop()
+        .then(() => console.log("🛑 SignalR stopped"))
+        .catch(err => console.error("Stop error:", err));
     };
   }, [url]);
 

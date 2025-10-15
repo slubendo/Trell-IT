@@ -28,7 +28,7 @@ export async function fetchLikes(){
 
     const TrelloLike = {
       TrelloId: id,
-      TrelloPersonId: 1,
+      TrelloPersonId: 2,
       Liked: true
     }
 
@@ -46,11 +46,11 @@ export async function fetchLikes(){
     return data
   }
 
-  export async function updateLike(id:number, trelloId:number, liked:boolean){
+  export async function updateLike(id:number, trelloId:number, liked:boolean, trelloPersonId:number){
 const updateLike = {
   Id: id,
   TrelloId: trelloId,
-  TrelloPersonId: 1,
+  TrelloPersonId: trelloPersonId,
   Liked: !liked
 }
 
@@ -86,11 +86,11 @@ const updateLike = {
   }
 
 
-  export async function createTrello(id:number, content:string, section:string){
+  export async function createTrello(id:number, content:string, personId:number, section:string){
     const createTrello = {
       id: id,
       content: content,
-      trellopersonid:1,
+      trellopersonid:personId,
       section: section,
       createdAt:  new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
     }
@@ -139,6 +139,19 @@ const updateLike = {
   export async function deleteTrello(id:number){
     const dataBody = await fetch(`/api/Trellos/${id}`, {
       method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await dataBody.json();
+    console.log(data)
+  
+    return data
+  }
+
+  export async function fetchPerson(){
+    const dataBody = await fetch("/api/TrelloPerson", {
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },

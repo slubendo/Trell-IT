@@ -3,7 +3,7 @@ using TrelloLike.Hubs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.OpenApi;
 using TrelloLike.Controllers;
-using System.Text.Json;
+// using System.Text.Json;
 
 
 DotNetEnv.Env.Load();
@@ -39,10 +39,10 @@ builder.Services.AddDbContext<DatabaseContext>(
 );
 
 builder.Services.AddControllers();
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-});
+// builder.Services.AddControllers().AddJsonOptions(options =>
+// {
+//     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+// });
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
