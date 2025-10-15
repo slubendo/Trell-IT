@@ -28,7 +28,7 @@ export async function fetchLikes(){
 
     const TrelloLike = {
       TrelloId: id,
-      TrelloPersonId: 1,
+      TrelloPersonId: 2,
       Liked: true
     }
 
@@ -46,11 +46,11 @@ export async function fetchLikes(){
     return data
   }
 
-  export async function updateLike(id:number, trelloId:number, liked:boolean){
+  export async function updateLike(id:number, trelloId:number, liked:boolean, trelloPersonId:number){
 const updateLike = {
   Id: id,
   TrelloId: trelloId,
-  TrelloPersonId: 1,
+  TrelloPersonId: trelloPersonId,
   Liked: !liked
 }
 

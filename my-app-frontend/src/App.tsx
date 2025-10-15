@@ -6,6 +6,7 @@ import { faCalendarXmark, faHeart} from '@fortawesome/free-regular-svg-icons';
 import './App.css'
 import { createLike, createTrello, deleteTrello, fetchLikes, fetchPerson, fetchTrellos, updateLike, updateTrello } from './action';
 import useSignalR from "./useSignalR";
+import { HubConnectionState } from "@microsoft/signalr";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 
@@ -78,7 +79,6 @@ useEffect(() => {
 
       const sortedPersons = personData.sort((a: { id: number }, b: { id: number }) => a.id - b.id);
       setPersons(sortedPersons);
-      console.log(persons)
     } catch (error) {
       console.error("Error fetching likes/persons:", error);
     }
@@ -96,49 +96,30 @@ useEffect(() => {
 const { connection: connectionTrello } = useSignalR("http://localhost:5193/r/trelloHub");
 const { connection: connectionTrelloLike } = useSignalR("http://localhost:5193/r/trellolikeHub");
 
-
-
 useEffect(() => {
-  if (!connectionTrello) {
-    return;
-  }
-  if (!connectionTrelloLike) {
-    return;
-  }
-  // listen for messages from the server
-  connectionTrello.on("ReceiveTrello", (trello: Trello) => {
-  console.log("Received new Trello:", trello);
+  // ensure both connections exist
+  if (!connectionTrello || !connectionTrelloLike) return;
 
-  setColumns(prevColumns => {
-    const updated: Columns = { ...prevColumns };
-
-    if (updated[trello.section as keyof Columns]) {
-      updated[trello.section as keyof Columns] = [
-        ...updated[trello.section as keyof Columns],
-        trello
-      ];
+  // helper to safely attach listeners after connection is started
+  const setupHandlers = async () => {
+    // wait for both connections to be in Connected state
+    if (connectionTrello.state !== HubConnectionState.Connected) {
+      await connectionTrello.start().catch(err => console.error("Trello connection error:", err));
     }
 
-    return updated;
-  });
-});
+    if (connectionTrelloLike.state !== HubConnectionState.Connected) {
+      await connectionTrelloLike.start().catch(err => console.error("TrelloLike connection error:", err));
+    }
 
+    console.log("✅ SignalR connections ready");
 
-
-    connectionTrello.on("UpdatedTrello", (trello: Trello) => {
-      console.log("Received Updated Trello: ", trello);
+    // ----- Trello Hub -----
+    connectionTrello.on("ReceiveTrello", (trello: Trello) => {
+      console.log("📥 Received new Trello:", trello);
 
       setColumns(prevColumns => {
         const updated: Columns = { ...prevColumns };
 
-        // Remove from all sections (in case section changed)
-        for (const section in updated) {
-          updated[section as keyof Columns] = updated[section as keyof Columns].filter(
-            t => t.id !== trello.id
-          );
-        }
-
-        // Add to the new section
         if (updated[trello.section as keyof Columns]) {
           updated[trello.section as keyof Columns] = [
             ...updated[trello.section as keyof Columns],
@@ -150,55 +131,81 @@ useEffect(() => {
       });
     });
 
- connectionTrello.on("DeleteTrello", (deletedTrelloId: number) => {
-  console.log("Received delete Trello:", deletedTrelloId);
+    connectionTrello.on("UpdatedTrello", (trello: Trello) => {
+      console.log("🔄 Received Updated Trello:", trello);
 
-  setColumns(prevColumns => {
-    const updated: Columns = {} as Columns;
+      setColumns(prevColumns => {
+        const updated: Columns = { ...prevColumns };
 
-    // loop each section and filter out the deleted card
-    (Object.keys(prevColumns) as (keyof Columns)[]).forEach(section => {
-      updated[section] = prevColumns[section].filter(
-        card => card.id !== deletedTrelloId
-      );
+        // remove from all sections (if section changed)
+        for (const section in updated) {
+          updated[section as keyof Columns] = updated[section as keyof Columns].filter(
+            t => t.id !== trello.id
+          );
+        }
+
+        // add to new section
+        if (updated[trello.section as keyof Columns]) {
+          updated[trello.section as keyof Columns] = [
+            ...updated[trello.section as keyof Columns],
+            trello
+          ];
+        }
+
+        return updated;
+      });
     });
 
-  return updated;
-});
+    connectionTrello.on("DeleteTrello", (deletedTrelloId: number) => {
+      console.log("🗑️ Received delete Trello:", deletedTrelloId);
 
-  connectionTrelloLike.on("ReceiveLike", (like: {
-        id: number;
-        trelloId: number;
-        trelloPersonId: number;
-        liked: boolean;
-      }) => {
-        console.log('Received like:', like);
+      setColumns(prevColumns => {
+        const updated: Columns = {} as Columns;
 
-        // Map to your internal state shape if needed
-        setLikes(prevLikes => [...prevLikes, {
+        (Object.keys(prevColumns) as (keyof Columns)[]).forEach(section => {
+          updated[section] = prevColumns[section].filter(card => card.id !== deletedTrelloId);
+        });
+
+        return updated;
+      });
+    });
+
+    // ----- TrelloLike Hub -----
+    connectionTrelloLike.on("ReceiveLike", (like: {
+      id: number;
+      trelloId: number;
+      trelloPersonId: number;
+      liked: boolean;
+    }) => {
+      console.log("💚 Received like:", like);
+
+      setLikes(prevLikes => [
+        ...prevLikes,
+        {
           id: like.id,
           trelloId: like.trelloId,
           trelloPersonId: like.trelloPersonId,
           liked: like.liked
-        }]);
-      });
+        }
+      ]);
+    });
 
-    connectionTrelloLike.on("UpdateLike", (id:number) => {
-    // from the server
+    connectionTrelloLike.on("UpdateLike", (id: number) => {
+      console.log("🔁 Received UpdateLike:", id);
+
       setLikes(prevLikes =>
         prevLikes.map(like =>
-          like.id === id
-            ? { ...like, liked: !like.liked } // toggle liked
-            : like // leave others unchanged
+          like.id === id ? { ...like, liked: !like.liked } : like
         )
-    );
-  });
+      );
+    });
+  };
 
-});
+  setupHandlers();
 
-
+  // Cleanup: remove handlers when component unmounts
   return () => {
-    console.log("off")
+    console.log("🧹 Cleaning up SignalR handlers");
     connectionTrello.off("ReceiveTrello");
     connectionTrello.off("UpdatedTrello");
     connectionTrello.off("DeleteTrello");
@@ -206,10 +213,6 @@ useEffect(() => {
     connectionTrelloLike.off("UpdateLike");
   };
 }, [connectionTrello, connectionTrelloLike]);
-
-
-
-
 
 
 function exampleLiked(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
@@ -228,16 +231,20 @@ function exampleLiked(e:React.MouseEvent<SVGSVGElement, MouseEvent>) {
 
 async function liked(e: React.MouseEvent<SVGSVGElement, MouseEvent>, id: number, trelloid:number) {
   e.preventDefault();
-
+  const icon = e.currentTarget
+  console.log(icon)
+  console.log(trelloid)
+  
   const likedTrello = likes.find((like: any) => like.id === id);
-
+  
   if (likedTrello) {
+    console.log("hey this is liked");
     console.log(likedTrello);
     console.log(likedTrello.liked)
-    await updateLike(likedTrello.id, likedTrello.trelloId, likedTrello.liked);
+    await updateLike(likedTrello.id, likedTrello.trelloId, likedTrello.liked, likedTrello.trelloPersonId);
     connectionTrelloLike?.invoke("UpdateLike", id)
   } else {
-    console.log("hey");
+    console.log("hey like created");
     const data = await createLike(trelloid);
 
     const newLike = {
@@ -423,7 +430,7 @@ if (body) {
         let id;
         const content = input?.value
         console.log(id, content, section)
-        handleCreate(id ?? 0, content ?? "", 2, section ?? "")
+        handleCreate(id ?? 0, content ?? "", 3, section ?? "")
         
         const open = document.querySelectorAll(".open")
         if(open) {
@@ -442,33 +449,23 @@ if (body) {
 
 
 
+function LikeButton({ trello }: { trello: any }) {
+  const likedTrello = likes.find((like: any) => like.trelloId === trello.id);
+  const handleClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    console.log('likeButton clicked', e)
+    liked(e, likedTrello?.id ?? 0, trello.id);
+    exampleLiked(e);
+  };
 
-
-function renderLike(trello: any) {
-
-  let likedTrello:any;
-  if (likes.length > 0) {
-    // Find the first like object that matches the trelloId
-     likedTrello = likes.find((like: any) => like.trelloId === trello.id);
-
-
-      return (
-        <FontAwesomeIcon
-          key={likedTrello?.id ? 0 :likedTrello?.id}
-          icon={faHeart}
-          className="overflow-hidden"
-          style={{ color: likedTrello?.liked ? "red" : "gray" }}
-          onClick={(e) => {
-
-            liked(e, likedTrello?.id ?? 0, trello.id);
-            exampleLiked(e);
-            }}
-          />
-      );
-  }
+  return (
+    <FontAwesomeIcon
+      icon={faHeart}
+      style={{ color: likedTrello?.liked ? "red" : "gray" }}
+      className="overflow-hidden ml-1 mr-2"
+      onClick={handleClick}
+    />
+  );
 }
-
-
 
 
 async function handleDragEnd(result: any) {
@@ -564,9 +561,9 @@ return (
                     <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
                       {/* Left side: like button */}
                       <div className="flex likeDiv items-center">
-                        <button className="flex items-center ml-1 mr-2">
-                            <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}} onClick={exampleLiked}/>
-                        </button>
+                        {/* <button className="flex items-center ml-1 mr-2"> */}
+                            <FontAwesomeIcon icon={faHeart} className='overflow-hidden ml-1 mr-2' style={{color:'gray'}} onClick={exampleLiked}/>
+                        {/* </button> */}
                         <img
                           className="w-9 h-9 border-green-300 border-2 rounded-full mr-1"
                           src="/1.png"
@@ -607,7 +604,21 @@ return (
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`${section}-${card.id}`}>
+                    className={`${section}-${card.id}`}
+                      style={{
+                        ...provided.draggableProps.style,
+                        cursor: "default", // normal pointer
+                      }}
+                      onMouseDown={(e) => {
+                        (e.currentTarget as HTMLElement).style.cursor = "grabbing";
+                      }}
+                      onMouseUp={(e) => {
+                        (e.currentTarget as HTMLElement).style.cursor = "default";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLElement).style.cursor = "default";
+                      }}
+                    >
                       
                     <div className="relative flex flex-col items-start p-4 mt-3 bg-white rounded-lg bg-opacity-90 group hover:bg-opacity-100">
                       {/* delete */}
@@ -619,23 +630,36 @@ return (
                           onClick={() => handleDelete(card.id)}
                         />
                       </div>
-                      <span className={`flex items-center h-6 px-3 text-xs font-semibold text-${persons[card.trelloPersonId].color}-500 bg-${persons[card.trelloPersonId].color}-100 rounded-full`}>
-                        {persons[card.trelloPersonId].title}
-                      </span>
+                        {(() => {
+                          const matchedPersons = persons.filter(p => p.id === card.trelloPersonId);
+                          if (matchedPersons.length === 0) return null; // no match found
+
+                          const person = matchedPersons[0]; // first match
+                          return (
+                            <span
+                              className={`flex items-center h-6 px-3 text-xs font-semibold text-${person.color}-500 bg-${person.color}-100 rounded-full`}
+                            >
+                              {person.title}
+                            </span>
+                          );
+                        })()}
+
                       <h4 className="mt-3 text-sm font-medium text-center">{card.content}</h4>
 
                      <div className="flex items-center w-full mt-3 text-xs font-medium text-gray-400">
                       {/* Left side: like button */}
                       <div className="flex likeDiv items-center">
-                        <button className="flex items-center ml-1 mr-2">
-                            <FontAwesomeIcon icon={faHeart} className='overflow-hidden' style={{color:'gray'}}  onClick={() => renderLike(card)}/>
-                        </button>
+                    <button className="flex items-center ml-1 mr-2">
+                      <LikeButton trello={card} />
+                    </button>
                           {likes
                           .filter((like) => like.trelloId === card.id)  
                           .slice(0, 3)                                 
                           .map((like) => {
-                            const person = persons.find(p => p.id === like.trelloPersonId); // get correct person
-                            if (!person) return null;
+                      const person = persons.find(
+                        (p) => p.id === like.trelloPersonId && like.liked !== false // ensure valid liker
+                      );                            
+                      if (!person) return null;
 
                             return (
                               <img className={`w-9 h-9 border-${person.color}-300 border-2 rounded-full mr-1`}

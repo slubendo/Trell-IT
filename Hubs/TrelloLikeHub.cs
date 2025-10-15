@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.SignalR;
-using System.Text.Json;
 
 
 namespace TrelloLike.Hubs;
@@ -20,7 +19,7 @@ public class TrelloLikeHub : Hub
   }
   public async Task CreateLike(TrelloLike.Models.TrelloLike like)
   {
-    Console.WriteLine($"Received like: {JsonSerializer.Serialize(like)}");
+    Console.WriteLine($"Received like: {like}");
     await Clients.All.SendAsync("ReceiveLike", like);
   }
     public async Task UpdateLike(int id)
