@@ -93,8 +93,8 @@ useEffect(() => {
 
 
 
-const { connection: connectionTrello } = useSignalR("http://localhost:5193/r/trelloHub");
-const { connection: connectionTrelloLike } = useSignalR("http://localhost:5193/r/trellolikeHub");
+const { connection: connectionTrello } = useSignalR("https://trell-it.fly.dev/r/trelloHub");
+const { connection: connectionTrelloLike } = useSignalR("https://trell-it.fly.dev/r/trellolikeHub");
 
 useEffect(() => {
   // ensure both connections exist
