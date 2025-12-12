@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Home\\Documents\\Tech\\Trell-IT\\TrelloLike.csproj": {}
+    "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/TrelloLike.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Home\\Documents\\Tech\\Trell-IT\\TrelloLike.csproj": {
+    "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/TrelloLike.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Home\\Documents\\Tech\\Trell-IT\\TrelloLike.csproj",
+        "projectUniqueName": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/TrelloLike.csproj",
         "projectName": "TrelloLike",
-        "projectPath": "C:\\Users\\Home\\Documents\\Tech\\Trell-IT\\TrelloLike.csproj",
-        "packagesPath": "C:\\Users\\Home\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Home\\Documents\\Tech\\Trell-IT\\obj\\",
+        "projectPath": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/TrelloLike.csproj",
+        "packagesPath": "/Users/stephanelubendo/.nuget/packages/",
+        "outputPath": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Home\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/Users/stephanelubendo/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
         "net8.0": {
@@ -86,6 +86,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.14, 8.0.14]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[8.0.14, 8.0.14]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.14, 8.0.14]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -94,7 +108,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/9.0.202/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

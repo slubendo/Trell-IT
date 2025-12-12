@@ -1,20 +1,24 @@
 {
   "Files": [
     {
-      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/StephaneLubendo.png",
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/StephaneLubendo.png",
       "PackagePath": "staticwebassets/StephaneLubendo.png"
     },
     {
-      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/assets/index-CX9_aZsJ.css",
-      "PackagePath": "staticwebassets/assets/index-CX9_aZsJ.css"
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DNPNPKlP.css",
+      "PackagePath": "staticwebassets/assets/index-DNPNPKlP.css"
     },
     {
-      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/assets/index-Ds8SmliR.js",
-      "PackagePath": "staticwebassets/assets/index-Ds8SmliR.js"
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-z3D-j9lN.js",
+      "PackagePath": "staticwebassets/assets/index-z3D-j9lN.js"
     },
     {
-      "Id": "/home/stephanelubendo/Documents/DocumentsToKeep/Coding/ASP.NET/TrelloLike/wwwroot/index.html",
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/index.html",
       "PackagePath": "staticwebassets/index.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.TrelloLike.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
     },
     {
       "Id": "obj/Debug/net8.0/staticwebassets/msbuild.TrelloLike.Microsoft.AspNetCore.StaticWebAssets.props",
