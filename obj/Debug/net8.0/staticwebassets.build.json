@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "vcRHxjJnR5V//In/tSsoFj10vYASrGu9DNgfmtNz/cE=",
+  "Hash": "G9SEWjY8dCXSTBbLJoOYxdOjKhI4JgvnOLmEYf87g8E=",
   "Source": "TrelloLike",
   "BasePath": "_content/TrelloLike",
   "Mode": "Default",
@@ -17,12 +17,12 @@
   ],
   "Assets": [
     {
-      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DNPNPKlP.css",
+      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/1.png",
       "SourceId": "TrelloLike",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/",
       "BasePath": "_content/TrelloLike",
-      "RelativePath": "assets/index-DNPNPKlP#[.{fingerprint}]?.css",
+      "RelativePath": "1#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -31,19 +31,19 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "7nahgnij1q",
-      "Integrity": "3QO+e+xHuQGVuQTQBl/wBtWfTMsmX7PqUrt6YiVXbY8=",
+      "Fingerprint": "8avud4jide",
+      "Integrity": "4GaB/7oaaSEuHwdrC5mKWU3Y4lqWHR/BfO2U/Wp5MEA=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/assets/index-DNPNPKlP.css"
+      "OriginalItemSpec": "wwwroot/1.png"
     },
     {
-      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-z3D-j9lN.js",
+      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/2.png",
       "SourceId": "TrelloLike",
       "SourceType": "Discovered",
       "ContentRoot": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/",
       "BasePath": "_content/TrelloLike",
-      "RelativePath": "assets/index-z3D-j9lN#[.{fingerprint}]?.js",
+      "RelativePath": "2#[.{fingerprint}]?.png",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -52,11 +52,95 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "09gbqp9ql0",
-      "Integrity": "BJVLZDrdbuFItjwfh2/d3V+NVAAFj14OcipTgpUrPKQ=",
+      "Fingerprint": "0n2gvkptq3",
+      "Integrity": "XJCWXEC3X98HIoGDwjqju2XzAseVKgIZkOdAo4YSM4E=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/assets/index-z3D-j9lN.js"
+      "OriginalItemSpec": "wwwroot/2.png"
+    },
+    {
+      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/3.png",
+      "SourceId": "TrelloLike",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/",
+      "BasePath": "_content/TrelloLike",
+      "RelativePath": "3#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "bk35m0bnm4",
+      "Integrity": "S+eKmoBH9GsJqDShyhsADOj6EnitIoatfZt3dU+j+18=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/3.png"
+    },
+    {
+      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/4.png",
+      "SourceId": "TrelloLike",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/",
+      "BasePath": "_content/TrelloLike",
+      "RelativePath": "4#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "63rlsewukh",
+      "Integrity": "nm84bLkDGzCdCZHQhT1GYleVRdcppV2lAnZI+oH36eU=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/4.png"
+    },
+    {
+      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-D42XLL7U.css",
+      "SourceId": "TrelloLike",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/",
+      "BasePath": "_content/TrelloLike",
+      "RelativePath": "assets/index-D42XLL7U#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "wtytc3e7lz",
+      "Integrity": "bJKffoWQlizV4FtVfOz4zfWn/vBZnK5Jf0zMaPagH2Q=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/assets/index-D42XLL7U.css"
+    },
+    {
+      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DN1hy_q6.js",
+      "SourceId": "TrelloLike",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/",
+      "BasePath": "_content/TrelloLike",
+      "RelativePath": "assets/index-DN1hy_q6#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "lguo9g2go9",
+      "Integrity": "y0bfk4cVL8GQny33/EZv25yoHL721lnSqVAbIsTnNxQ=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/assets/index-DN1hy_q6.js"
     },
     {
       "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/index.html",
@@ -73,38 +157,17 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "dtbnb1pi3i",
-      "Integrity": "b8UmLrVnCULFXCxiWoDR5nOBvkBhbop+Sehmx+vDcw4=",
+      "Fingerprint": "a7lppvuqyi",
+      "Integrity": "lix9ylv2O1BLNR5Lk5gBZPKqjezr/ODPSl7sP9mIXxU=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/index.html"
-    },
-    {
-      "Identity": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/StephaneLubendo.png",
-      "SourceId": "TrelloLike",
-      "SourceType": "Discovered",
-      "ContentRoot": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/",
-      "BasePath": "_content/TrelloLike",
-      "RelativePath": "StephaneLubendo#[.{fingerprint}]?.png",
-      "AssetKind": "All",
-      "AssetMode": "All",
-      "AssetRole": "Primary",
-      "AssetMergeBehavior": "",
-      "AssetMergeSource": "",
-      "RelatedAsset": "",
-      "AssetTraitName": "",
-      "AssetTraitValue": "",
-      "Fingerprint": "01xk2gy41x",
-      "Integrity": "zHkVbPW04SH0EoZJLJaUM7IBAb6oXyZ5WvNpctHfgKA=",
-      "CopyToOutputDirectory": "Never",
-      "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot/StephaneLubendo.png"
     }
   ],
   "Endpoints": [
     {
-      "Route": "assets/index-DNPNPKlP.7nahgnij1q.css",
-      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DNPNPKlP.css",
+      "Route": "1.8avud4jide.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -113,19 +176,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "10292"
+          "Value": "18871"
         },
         {
           "Name": "Content-Type",
-          "Value": "text/css"
+          "Value": "image/png"
         },
         {
           "Name": "ETag",
-          "Value": "\"3QO+e+xHuQGVuQTQBl/wBtWfTMsmX7PqUrt6YiVXbY8=\""
+          "Value": "\"4GaB/7oaaSEuHwdrC5mKWU3Y4lqWHR/BfO2U/Wp5MEA=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -135,21 +198,21 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "7nahgnij1q"
+          "Value": "8avud4jide"
         },
         {
           "Name": "label",
-          "Value": "assets/index-DNPNPKlP.css"
+          "Value": "1.png"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-3QO+e+xHuQGVuQTQBl/wBtWfTMsmX7PqUrt6YiVXbY8="
+          "Value": "sha256-4GaB/7oaaSEuHwdrC5mKWU3Y4lqWHR/BfO2U/Wp5MEA="
         }
       ]
     },
     {
-      "Route": "assets/index-DNPNPKlP.css",
-      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DNPNPKlP.css",
+      "Route": "1.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/1.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -158,35 +221,35 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "10292"
+          "Value": "18871"
         },
         {
           "Name": "Content-Type",
-          "Value": "text/css"
+          "Value": "image/png"
         },
         {
           "Name": "ETag",
-          "Value": "\"3QO+e+xHuQGVuQTQBl/wBtWfTMsmX7PqUrt6YiVXbY8=\""
+          "Value": "\"4GaB/7oaaSEuHwdrC5mKWU3Y4lqWHR/BfO2U/Wp5MEA=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
         },
         {
           "Name": "Cache-Control",
-          "Value": "no-cache"
+          "Value": "max-age=3600, must-revalidate"
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-3QO+e+xHuQGVuQTQBl/wBtWfTMsmX7PqUrt6YiVXbY8="
+          "Value": "sha256-4GaB/7oaaSEuHwdrC5mKWU3Y4lqWHR/BfO2U/Wp5MEA="
         }
       ]
     },
     {
-      "Route": "assets/index-z3D-j9lN.09gbqp9ql0.js",
-      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-z3D-j9lN.js",
+      "Route": "2.0n2gvkptq3.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/2.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -195,19 +258,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "295992"
+          "Value": "23630"
         },
         {
           "Name": "Content-Type",
-          "Value": "text/javascript"
+          "Value": "image/png"
         },
         {
           "Name": "ETag",
-          "Value": "\"BJVLZDrdbuFItjwfh2/d3V+NVAAFj14OcipTgpUrPKQ=\""
+          "Value": "\"XJCWXEC3X98HIoGDwjqju2XzAseVKgIZkOdAo4YSM4E=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -217,21 +280,21 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "09gbqp9ql0"
+          "Value": "0n2gvkptq3"
         },
         {
           "Name": "label",
-          "Value": "assets/index-z3D-j9lN.js"
+          "Value": "2.png"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-BJVLZDrdbuFItjwfh2/d3V+NVAAFj14OcipTgpUrPKQ="
+          "Value": "sha256-XJCWXEC3X98HIoGDwjqju2XzAseVKgIZkOdAo4YSM4E="
         }
       ]
     },
     {
-      "Route": "assets/index-z3D-j9lN.js",
-      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-z3D-j9lN.js",
+      "Route": "2.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/2.png",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -240,19 +303,220 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "295992"
+          "Value": "23630"
         },
         {
           "Name": "Content-Type",
-          "Value": "text/javascript"
+          "Value": "image/png"
         },
         {
           "Name": "ETag",
-          "Value": "\"BJVLZDrdbuFItjwfh2/d3V+NVAAFj14OcipTgpUrPKQ=\""
+          "Value": "\"XJCWXEC3X98HIoGDwjqju2XzAseVKgIZkOdAo4YSM4E=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-XJCWXEC3X98HIoGDwjqju2XzAseVKgIZkOdAo4YSM4E="
+        }
+      ]
+    },
+    {
+      "Route": "3.bk35m0bnm4.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/3.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18136"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"S+eKmoBH9GsJqDShyhsADOj6EnitIoatfZt3dU+j+18=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "bk35m0bnm4"
+        },
+        {
+          "Name": "label",
+          "Value": "3.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-S+eKmoBH9GsJqDShyhsADOj6EnitIoatfZt3dU+j+18="
+        }
+      ]
+    },
+    {
+      "Route": "3.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/3.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "18136"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"S+eKmoBH9GsJqDShyhsADOj6EnitIoatfZt3dU+j+18=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-S+eKmoBH9GsJqDShyhsADOj6EnitIoatfZt3dU+j+18="
+        }
+      ]
+    },
+    {
+      "Route": "4.63rlsewukh.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/4.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "15960"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nm84bLkDGzCdCZHQhT1GYleVRdcppV2lAnZI+oH36eU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "63rlsewukh"
+        },
+        {
+          "Name": "label",
+          "Value": "4.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-nm84bLkDGzCdCZHQhT1GYleVRdcppV2lAnZI+oH36eU="
+        }
+      ]
+    },
+    {
+      "Route": "4.png",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/4.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "15960"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"nm84bLkDGzCdCZHQhT1GYleVRdcppV2lAnZI+oH36eU=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-nm84bLkDGzCdCZHQhT1GYleVRdcppV2lAnZI+oH36eU="
+        }
+      ]
+    },
+    {
+      "Route": "assets/index-D42XLL7U.css",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-D42XLL7U.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "11443"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"bJKffoWQlizV4FtVfOz4zfWn/vBZnK5Jf0zMaPagH2Q=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -262,12 +526,139 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-BJVLZDrdbuFItjwfh2/d3V+NVAAFj14OcipTgpUrPKQ="
+          "Value": "sha256-bJKffoWQlizV4FtVfOz4zfWn/vBZnK5Jf0zMaPagH2Q="
         }
       ]
     },
     {
-      "Route": "index.dtbnb1pi3i.html",
+      "Route": "assets/index-D42XLL7U.wtytc3e7lz.css",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-D42XLL7U.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "11443"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"bJKffoWQlizV4FtVfOz4zfWn/vBZnK5Jf0zMaPagH2Q=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "wtytc3e7lz"
+        },
+        {
+          "Name": "label",
+          "Value": "assets/index-D42XLL7U.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-bJKffoWQlizV4FtVfOz4zfWn/vBZnK5Jf0zMaPagH2Q="
+        }
+      ]
+    },
+    {
+      "Route": "assets/index-DN1hy_q6.js",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DN1hy_q6.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "387825"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"y0bfk4cVL8GQny33/EZv25yoHL721lnSqVAbIsTnNxQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-y0bfk4cVL8GQny33/EZv25yoHL721lnSqVAbIsTnNxQ="
+        }
+      ]
+    },
+    {
+      "Route": "assets/index-DN1hy_q6.lguo9g2go9.js",
+      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DN1hy_q6.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "387825"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"y0bfk4cVL8GQny33/EZv25yoHL721lnSqVAbIsTnNxQ=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "lguo9g2go9"
+        },
+        {
+          "Name": "label",
+          "Value": "assets/index-DN1hy_q6.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-y0bfk4cVL8GQny33/EZv25yoHL721lnSqVAbIsTnNxQ="
+        }
+      ]
+    },
+    {
+      "Route": "index.a7lppvuqyi.html",
       "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/index.html",
       "Selectors": [],
       "ResponseHeaders": [
@@ -277,7 +668,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "405"
+          "Value": "393"
         },
         {
           "Name": "Content-Type",
@@ -285,11 +676,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"b8UmLrVnCULFXCxiWoDR5nOBvkBhbop+Sehmx+vDcw4=\""
+          "Value": "\"lix9ylv2O1BLNR5Lk5gBZPKqjezr/ODPSl7sP9mIXxU=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -299,7 +690,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "dtbnb1pi3i"
+          "Value": "a7lppvuqyi"
         },
         {
           "Name": "label",
@@ -307,7 +698,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-b8UmLrVnCULFXCxiWoDR5nOBvkBhbop+Sehmx+vDcw4="
+          "Value": "sha256-lix9ylv2O1BLNR5Lk5gBZPKqjezr/ODPSl7sP9mIXxU="
         }
       ]
     },
@@ -322,7 +713,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "405"
+          "Value": "393"
         },
         {
           "Name": "Content-Type",
@@ -330,11 +721,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"b8UmLrVnCULFXCxiWoDR5nOBvkBhbop+Sehmx+vDcw4=\""
+          "Value": "\"lix9ylv2O1BLNR5Lk5gBZPKqjezr/ODPSl7sP9mIXxU=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
+          "Value": "Fri, 12 Dec 2025 17:12:40 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -344,89 +735,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-b8UmLrVnCULFXCxiWoDR5nOBvkBhbop+Sehmx+vDcw4="
-        }
-      ]
-    },
-    {
-      "Route": "StephaneLubendo.01xk2gy41x.png",
-      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/StephaneLubendo.png",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "215197"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/png"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"zHkVbPW04SH0EoZJLJaUM7IBAb6oXyZ5WvNpctHfgKA=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=31536000, immutable"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "fingerprint",
-          "Value": "01xk2gy41x"
-        },
-        {
-          "Name": "label",
-          "Value": "StephaneLubendo.png"
-        },
-        {
-          "Name": "integrity",
-          "Value": "sha256-zHkVbPW04SH0EoZJLJaUM7IBAb6oXyZ5WvNpctHfgKA="
-        }
-      ]
-    },
-    {
-      "Route": "StephaneLubendo.png",
-      "AssetFile": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/StephaneLubendo.png",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "215197"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/png"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"zHkVbPW04SH0EoZJLJaUM7IBAb6oXyZ5WvNpctHfgKA=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Fri, 12 Dec 2025 05:11:48 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=3600, must-revalidate"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-zHkVbPW04SH0EoZJLJaUM7IBAb6oXyZ5WvNpctHfgKA="
+          "Value": "sha256-lix9ylv2O1BLNR5Lk5gBZPKqjezr/ODPSl7sP9mIXxU="
         }
       ]
     }

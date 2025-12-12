@@ -6,9 +6,9 @@ import tailwindcss from "tailwindcss";
 export default defineConfig({
   server: {
     proxy: {
-      "/api": "http://localhost:5193",
+      "/api": "https://trell-it-withered-fire-570.fly.dev/",
       "/r": {
-        target: "http://localhost:5193",
+        target: "https://trell-it-withered-fire-570.fly.dev/",
         ws: true,
       },
     },

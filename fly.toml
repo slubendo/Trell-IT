@@ -1,20 +1,19 @@
-# fly.toml app configuration file generated for trell-it on 2025-09-23T11:39:05-07:00
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
-app = 'trell-it'
-primary_region = 'sea'
+# fly.toml - trell-it backend
+app = 'trell-it-withered-fire-570'
+primary_region = 'ord'
 
 [build]
 
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = 'stop'
+  auto_stop_machines = true
   auto_start_machines = true
-  min_machines_running = 0
+  min_machines_running = 1
   processes = ['app']
+  
+[http_service.websocket]
+    enabled = true
 
 [[vm]]
   memory = '1gb'

@@ -45,18 +45,26 @@ builder.Services.AddControllers();
 // });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy.WithOrigins(
-                "http://localhost:5173",       // dev
-                "https://trell-it.fly.dev"        // production frontend
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // required for SignalR
-        });
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "https://trell-it-withered-fire-570.fly.dev"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials()       // REQUIRED for SignalR
+        .SetIsOriginAllowed(_ => true); // <- Add this for WebSockets on Fly
+    });
 });
+
+
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(8080); // Required by Fly.io
+});
+
 
 
 builder.Services.AddSignalR();
@@ -72,6 +80,7 @@ var app = builder.Build();
 //   app.UseSwaggerUI();
 // }
 
+app.UseCors("AllowFrontend");
 app.UseRouting();
 app.UseCors("AllowFrontend");
 

@@ -13,7 +13,7 @@ RUN dotnet restore
 RUN dotnet publish -c Release -o /app
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_SDK_VERSION}
 ENV ASPNETCORE_URLS http://+:8080
 ENV ASPNETCORE_ENVIRONMENT Production
 EXPOSE 8080

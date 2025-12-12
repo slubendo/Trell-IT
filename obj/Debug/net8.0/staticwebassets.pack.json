@@ -1,16 +1,28 @@
 {
   "Files": [
     {
-      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/StephaneLubendo.png",
-      "PackagePath": "staticwebassets/StephaneLubendo.png"
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/1.png",
+      "PackagePath": "staticwebassets/1.png"
     },
     {
-      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DNPNPKlP.css",
-      "PackagePath": "staticwebassets/assets/index-DNPNPKlP.css"
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/2.png",
+      "PackagePath": "staticwebassets/2.png"
     },
     {
-      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-z3D-j9lN.js",
-      "PackagePath": "staticwebassets/assets/index-z3D-j9lN.js"
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/3.png",
+      "PackagePath": "staticwebassets/3.png"
+    },
+    {
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/4.png",
+      "PackagePath": "staticwebassets/4.png"
+    },
+    {
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-D42XLL7U.css",
+      "PackagePath": "staticwebassets/assets/index-D42XLL7U.css"
+    },
+    {
+      "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/assets/index-DN1hy_q6.js",
+      "PackagePath": "staticwebassets/assets/index-DN1hy_q6.js"
     },
     {
       "Id": "/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/wwwroot/index.html",

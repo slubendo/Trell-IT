@@ -412,3 +412,5 @@ C:/Users/Home/Documents/Tech/Trell-IT/obj/Debug/net8.0/ref/TrelloLike.dll
 /Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/obj/Debug/net8.0/TrelloLike.pdb
 /Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/obj/Debug/net8.0/TrelloLike.genruntimeconfig.cache
 /Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/obj/Debug/net8.0/ref/TrelloLike.dll
+/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/bin/Debug/net8.0/package-lock.json
+/Users/stephanelubendo/Documents/Tech/Projects/Trell-IT/bin/Debug/net8.0/package.json
